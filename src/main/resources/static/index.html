@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz Manager – Spring Boot Dashboard</title>
+  <meta name="description" content="Manage quiz questions with a beautiful dashboard powered by Spring Boot REST API" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #0d0f1a;
+      --surface:      #141828;
+      --surface2:     #1c2235;
+      --surface3:     #232b42;
+      --border:       rgba(255,255,255,0.07);
+      --accent:       #6c63ff;
+      --accent2:      #a78bfa;
+      --accent-glow:  rgba(108,99,255,0.25);
+      --green:        #34d399;
+      --yellow:       #fbbf24;
+      --red:          #f87171;
+      --text:         #e8eaf6;
+      --text-muted:   #8892b0;
+      --radius:       14px;
+      --radius-sm:    8px;
+      --shadow:       0 4px 32px rgba(0,0,0,0.5);
+      --transition:   0.22s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Animated BG ──────────────────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(108,99,255,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(167,139,250,0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Layout ───────────────────────────────────────────────────────────── */
+    .app-layout { position: relative; z-index: 1; max-width: 1300px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* ── Header ───────────────────────────────────────────────────────────── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .logo h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #fff 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo span { font-size: 0.75rem; color: var(--text-muted); display: block; font-weight: 400; }
+
+    /* Health pill */
+    #health-pill {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.4rem 1rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+
+    .health-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      animation: pulse-dot 2s infinite;
+    }
+
+    .health-dot.up { background: var(--green); }
+    .health-dot.down { background: var(--red); animation: none; }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* ── Stats Bar ────────────────────────────────────────────────────────── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: var(--transition);
+      cursor: default;
+    }
+
+    .stat-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
+      transform: translateY(-2px);
+    }
+
+    .stat-icon {
+      font-size: 1.6rem;
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .stat-icon.purple { background: rgba(108,99,255,0.15); }
+    .stat-icon.green  { background: rgba(52,211,153,0.15); }
+    .stat-icon.yellow { background: rgba(251,191,36,0.15); }
+    .stat-icon.red    { background: rgba(248,113,113,0.15); }
+
+    .stat-value { font-size: 1.8rem; font-weight: 800; line-height: 1; }
+    .stat-label { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+    /* ── Main Grid ────────────────────────────────────────────────────────── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
+
+    /* ── Panel ────────────────────────────────────────────────────────────── */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .panel-body { padding: 1.5rem; }
+
+    /* ── Toolbar ──────────────────────────────────────────────────────────── */
+    .toolbar {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .input-group {
+      position: relative;
+    }
+
+    .input-group input,
+    .input-group select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 0.82rem;
+      font-family: inherit;
+      padding: 0.5rem 0.9rem;
+      transition: var(--transition);
+      outline: none;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .input-group select option { background: var(--surface2); }
+
+    /* ── Buttons ──────────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1.1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      color: #fff;
+      box-shadow: 0 2px 12px var(--accent-glow);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
+
+    .btn-ghost {
+      background: var(--surface2);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: var(--accent); }
+
+    .btn-danger {
+      background: rgba(248,113,113,0.12);
+      color: var(--red);
+      border: 1px solid rgba(248,113,113,0.2);
+    }
+    .btn-danger:hover { background: rgba(248,113,113,0.22); }
+
+    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.75rem; }
+    .btn-icon { padding: 0.35rem 0.5rem; }
+
+    /* ── Table ────────────────────────────────────────────────────────────── */
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.83rem;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: var(--transition);
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+
+    td {
+      padding: 0.85rem 1rem;
+      vertical-align: middle;
+    }
+
+    .td-title {
+      max-width: 280px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 500;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.22rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .badge-easy   { background: rgba(52,211,153,0.15); color: var(--green); }
+    .badge-medium { background: rgba(251,191,36,0.15);  color: var(--yellow); }
+    .badge-hard   { background: rgba(248,113,113,0.15); color: var(--red); }
+    .badge-default{ background: rgba(255,255,255,0.08); color: var(--text-muted); }
+
+    .cat-pill {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.7rem;
+      background: rgba(108,99,255,0.15);
+      color: var(--accent2);
+    }
+
+    /* ── Pagination ───────────────────────────────────────────────────────── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .page-btn {
+      width: 32px; height: 32px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+    }
+
+    .page-btn:hover, .page-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* ── Form ─────────────────────────────────────────────────────────────── */
+    .form-grid { display: flex; flex-direction: column; gap: 1rem; }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+
+    .form-group label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 0.84rem;
+      font-family: inherit;
+      padding: 0.65rem 0.9rem;
+      transition: var(--transition);
+      outline: none;
+      width: 100%;
+      resize: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .form-group select option { background: var(--surface2); }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    .form-error { font-size: 0.72rem; color: var(--red); margin-top: 0.2rem; display: none; }
+    .form-error.show { display: block; }
+
+    /* ── Toast ────────────────────────────────────────────────────────────── */
+    #toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .toast {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1.2rem;
+      font-size: 0.83rem;
+      min-width: 260px;
+      max-width: 360px;
+      box-shadow: var(--shadow);
+      animation: slideIn 0.3s ease, fadeOut 0.4s ease 2.6s forwards;
+    }
+
+    .toast.success { border-left-color: var(--green); }
+    .toast.error   { border-left-color: var(--red);   }
+    .toast.warn    { border-left-color: var(--yellow); }
+
+    @keyframes slideIn { from { opacity:0; transform: translateX(30px); } to { opacity:1; transform: translateX(0); } }
+    @keyframes fadeOut { from { opacity:1; } to { opacity:0; transform: translateX(30px); } }
+
+    /* ── Empty / Loading states ───────────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 0.75rem; opacity: 0.4; }
+    .empty-state p { font-size: 0.9rem; }
+
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface2) 25%, var(--surface3) 50%, var(--surface2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 4px;
+      height: 1rem;
+    }
+
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ── Modal ────────────────────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.open { display: flex; animation: fadeInOverlay 0.2s ease; }
+
+    @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: var(--shadow);
+      animation: scaleIn 0.2s ease;
+    }
+
+    @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-desc { font-size: 0.84rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+    .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; }
+
+    /* ── Quick links ──────────────────────────────────────────────────────── */
+    .quick-links {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .quick-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .quick-link:hover {
+      border-color: var(--accent);
+      color: var(--accent2);
+    }
+
+    /* ── Scrollbar ────────────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🧠</div>
+      <div>
+        <h1>Quiz Manager</h1>
+        <span>Spring Boot Dashboard</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+      <div id="health-pill">
+        <div class="health-dot" id="health-dot"></div>
+        <span id="health-text">Checking…</span>
+      </div>
+      <a href="/swagger-ui.html" target="_blank" class="btn btn-ghost">📄 Swagger UI</a>
+      <a href="/actuator/health" target="_blank" class="btn btn-ghost">🩺 Actuator</a>
+    </div>
+  </header>
+
+  <!-- ── Stats ──────────────────────────────────────────────────────────── -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-icon purple">📚</div>
+      <div>
+        <div class="stat-value" id="stat-total">–</div>
+        <div class="stat-label">Total Questions</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">🟢</div>
+      <div>
+        <div class="stat-value" id="stat-easy">–</div>
+        <div class="stat-label">Easy</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon yellow">🟡</div>
+      <div>
+        <div class="stat-value" id="stat-medium">–</div>
+        <div class="stat-label">Medium</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon red">🔴</div>
+      <div>
+        <div class="stat-value" id="stat-hard">–</div>
+        <div class="stat-label">Hard</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Quick Links ────────────────────────────────────────────────────── -->
+  <div class="quick-links">
+    <a href="/swagger-ui.html" target="_blank" class="quick-link">🔗 Swagger UI</a>
+    <a href="/actuator/health" target="_blank" class="quick-link">💚 /actuator/health</a>
+    <a href="/actuator/info" target="_blank" class="quick-link">ℹ️ /actuator/info</a>
+    <a href="/actuator/metrics" target="_blank" class="quick-link">📊 /actuator/metrics</a>
+    <a href="/api-docs" target="_blank" class="quick-link">📋 OpenAPI JSON</a>
+  </div>
+
+  <!-- ── Main Grid ──────────────────────────────────────────────────────── -->
+  <div class="main-grid">
+
+    <!-- Questions Table Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">📋 All Questions</div>
+        <div class="toolbar">
+          <div class="input-group">
+            <input id="filter-category" type="text" placeholder="Filter by category…" style="width:160px;" oninput="applyFilters()" />
+          </div>
+          <div class="input-group">
+            <select id="filter-difficulty" onchange="applyFilters()">
+              <option value="">All difficulties</option>
+              <option>Easy</option>
+              <option>Medium</option>
+              <option>Hard</option>
+            </select>
+          </div>
+          <button class="btn btn-ghost" onclick="loadQuestions()">🔄 Refresh</button>
+          <button class="btn btn-primary" onclick="openAddModal()">+ Add</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Question</th>
+              <th>Category</th>
+              <th>Difficulty</th>
+              <th>Answer</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="questions-tbody">
+            <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⏳</div><p>Loading…</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="pagination"></div>
+    </div>
+
+    <!-- Add/Edit Form Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title" id="form-panel-title">➕ Add Question</div>
+        <button class="btn btn-ghost btn-sm" onclick="resetForm()">Clear</button>
+      </div>
+      <div class="panel-body">
+        <form id="question-form" class="form-grid" onsubmit="submitForm(event)">
+          <input type="hidden" id="edit-id" />
+
+          <div class="form-group">
+            <label>Question *</label>
+            <textarea id="f-title" rows="3" placeholder="Enter the question text…" required></textarea>
+            <span class="form-error" id="e-title"></span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Option 1 *</label>
+              <input id="f-opt1" type="text" placeholder="Option A" required />
+            </div>
+            <div class="form-group">
+              <label>Option 2 *</label>
+              <input id="f-opt2" type="text" placeholder="Option B" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Option 3</label>
+              <input id="f-opt3" type="text" placeholder="Option C" />
+            </div>
+            <div class="form-group">
+              <label>Option 4</label>
+              <input id="f-opt4" type="text" placeholder="Option D" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Correct Answer *</label>
+            <input id="f-answer" type="text" placeholder="e.g. Paris" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category *</label>
+              <input id="f-category" type="text" placeholder="e.g. Java" required />
+            </div>
+            <div class="form-group">
+              <label>Difficulty *</label>
+              <select id="f-difficulty" required>
+                <option value="">Select…</option>
+                <option>Easy</option>
+                <option>Medium</option>
+                <option>Hard</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="form-submit-btn">
+            ✅ Save Question
+          </button>
+        </form>
+      </div>
+    </div>
+  </div><!-- /.main-grid -->
+
+</div><!-- /.app-layout -->
+
+<!-- ── Delete Confirm Modal ──────────────────────────────────────────────── -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal">
+    <div class="modal-title">🗑️ Delete Question</div>
+    <div class="modal-desc">Are you sure you want to delete this question? This action cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger" id="confirm-delete-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast Container ────────────────────────────────────────────────────── -->
+<div id="toast-container"></div>
+
+<script>
+  // ── Config ─────────────────────────────────────────────────────────────────
+  const API = '/question';
+  let currentPage = 0;
+  const PAGE_SIZE = 8;
+  let allQuestions = [];
+  let pendingDeleteId = null;
+
+  // ── Toast ───────────────────────────────────────────────────────────────────
+  function toast(msg, type = 'info') {
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    document.getElementById('toast-container').appendChild(el);
+    setTimeout(() => el.remove(), 3100);
+  }
+
+  // ── Health Check ────────────────────────────────────────────────────────────
+  async function checkHealth() {
+    try {
+      const r = await fetch('/actuator/health');
+      const data = await r.json();
+      const dot = document.getElementById('health-dot');
+      const txt = document.getElementById('health-text');
+      if (data.status === 'UP') {
+        dot.className = 'health-dot up';
+        txt.textContent = 'API is UP';
+      } else {
+        dot.className = 'health-dot down';
+        txt.textContent = 'API is DOWN';
+      }
+    } catch {
+      document.getElementById('health-dot').className = 'health-dot down';
+      document.getElementById('health-text').textContent = 'Cannot reach API';
+    }
+  }
+
+  // ── Load Questions ──────────────────────────────────────────────────────────
+  async function loadQuestions() {
+    const tbody = document.getElementById('questions-tbody');
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⏳</div><p>Loading…</p></div></td></tr>`;
+    try {
+      const r = await fetch(`${API}/allQuestion?page=0&size=1000`);
+      const data = await r.json();
+      allQuestions = data.content || [];
+      updateStats(allQuestions);
+      applyFilters();
+    } catch (err) {
+      toast('Failed to load questions. Is the server running?', 'error');
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⚠️</div><p>Could not connect to Spring Boot API</p></div></td></tr>`;
+    }
+  }
+
+  // ── Stats ───────────────────────────────────────────────────────────────────
+  function updateStats(questions) {
+    document.getElementById('stat-total').textContent  = questions.length;
+    document.getElementById('stat-easy').textContent   = questions.filter(q => q.difficultyLevel?.toLowerCase() === 'easy').length;
+    document.getElementById('stat-medium').textContent = questions.filter(q => q.difficultyLevel?.toLowerCase() === 'medium').length;
+    document.getElementById('stat-hard').textContent   = questions.filter(q => q.difficultyLevel?.toLowerCase() === 'hard').length;
+  }
+
+  // ── Filters + Render ─────────────────────────────────────────────────────────
+  function applyFilters() {
+    currentPage = 0;
+    const catFilter  = document.getElementById('filter-category').value.toLowerCase();
+    const diffFilter = document.getElementById('filter-difficulty').value.toLowerCase();
+
+    let filtered = allQuestions.filter(q => {
+      const catMatch  = !catFilter  || q.category?.toLowerCase().includes(catFilter);
+      const diffMatch = !diffFilter || q.difficultyLevel?.toLowerCase() === diffFilter;
+      return catMatch && diffMatch;
+    });
+
+    renderTable(filtered);
+    renderPagination(filtered);
+  }
+
+  function renderTable(data) {
+    const start = currentPage * PAGE_SIZE;
+    const slice = data.slice(start, start + PAGE_SIZE);
+    const tbody = document.getElementById('questions-tbody');
+
+    if (slice.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🔍</div><p>No questions found</p></div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = slice.map(q => `
+      <tr>
+        <td><span style="color:var(--text-muted);font-size:0.75rem">#${q.id}</span></td>
+        <td class="td-title" title="${escHtml(q.questionTitle)}">${escHtml(q.questionTitle)}</td>
+        <td><span class="cat-pill">${escHtml(q.category)}</span></td>
+        <td>${diffBadge(q.difficultyLevel)}</td>
+        <td style="color:var(--green);font-weight:500">${escHtml(q.rightAnswer)}</td>
+        <td>
+          <div style="display:flex;gap:0.4rem;">
+            <button class="btn btn-ghost btn-icon btn-sm" title="Edit" onclick="editQuestion(${q.id})">✏️</button>
+            <button class="btn btn-danger btn-icon btn-sm" title="Delete" onclick="confirmDelete(${q.id})">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function renderPagination(data) {
+    const totalPages = Math.ceil(data.length / PAGE_SIZE);
+    const pg = document.getElementById('pagination');
+
+    if (totalPages <= 1) { pg.innerHTML = ''; return; }
+
+    let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===0?'disabled':''}>‹</button>`;
+    for (let i = 0; i < totalPages; i++) {
+      html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i+1}</button>`;
+    }
+    html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages-1?'disabled':''}>›</button>`;
+    pg.innerHTML = html;
+  }
+
+  function goPage(page) {
+    currentPage = page;
+    const catFilter  = document.getElementById('filter-category').value.toLowerCase();
+    const diffFilter = document.getElementById('filter-difficulty').value.toLowerCase();
+    let filtered = allQuestions.filter(q => {
+      const catMatch  = !catFilter  || q.category?.toLowerCase().includes(catFilter);
+      const diffMatch = !diffFilter || q.difficultyLevel?.toLowerCase() === diffFilter;
+      return catMatch && diffMatch;
+    });
+    renderTable(filtered);
+    renderPagination(filtered);
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────────
+  function escHtml(str) {
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function diffBadge(level) {
+    const l = (level || '').toLowerCase();
+    const cls = l === 'easy' ? 'badge-easy' : l === 'medium' ? 'badge-medium' : l === 'hard' ? 'badge-hard' : 'badge-default';
+    return `<span class="badge ${cls}">${escHtml(level || '–')}</span>`;
+  }
+
+  // ── Form ─────────────────────────────────────────────────────────────────────
+  function openAddModal() {
+    resetForm();
+    document.getElementById('form-panel-title').textContent = '➕ Add Question';
+    document.getElementById('form-submit-btn').textContent = '✅ Save Question';
+    document.getElementById('f-title').focus();
+  }
+
+  function resetForm() {
+    document.getElementById('question-form').reset();
+    document.getElementById('edit-id').value = '';
+    document.getElementById('form-panel-title').textContent = '➕ Add Question';
+    document.getElementById('form-submit-btn').textContent = '✅ Save Question';
+  }
+
+  async function editQuestion(id) {
+    try {
+      const r = await fetch(`${API}/${id}`);
+      if (!r.ok) throw new Error('Not found');
+      const q = await r.json();
+      document.getElementById('edit-id').value      = q.id;
+      document.getElementById('f-title').value      = q.questionTitle   || '';
+      document.getElementById('f-opt1').value       = q.option1         || '';
+      document.getElementById('f-opt2').value       = q.option2         || '';
+      document.getElementById('f-opt3').value       = q.option3         || '';
+      document.getElementById('f-opt4').value       = q.option4         || '';
+      document.getElementById('f-answer').value     = q.rightAnswer     || '';
+      document.getElementById('f-category').value   = q.category        || '';
+      document.getElementById('f-difficulty').value = q.difficultyLevel || '';
+      document.getElementById('form-panel-title').textContent = `✏️ Edit #${q.id}`;
+      document.getElementById('form-submit-btn').textContent  = '💾 Update Question';
+      document.getElementById('f-title').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch {
+      toast('Failed to load question for editing', 'error');
+    }
+  }
+
+  async function submitForm(e) {
+    e.preventDefault();
+    const editId = document.getElementById('edit-id').value;
+    const payload = {
+      questionTitle:  document.getElementById('f-title').value.trim(),
+      option1:        document.getElementById('f-opt1').value.trim(),
+      option2:        document.getElementById('f-opt2').value.trim(),
+      option3:        document.getElementById('f-opt3').value.trim(),
+      option4:        document.getElementById('f-opt4').value.trim(),
+      rightAnswer:    document.getElementById('f-answer').value.trim(),
+      category:       document.getElementById('f-category').value.trim(),
+      difficultyLevel:document.getElementById('f-difficulty').value,
+    };
+
+    const btn = document.getElementById('form-submit-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Saving…';
+
+    try {
+      let r;
+      if (editId) {
+        r = await fetch(`${API}/update/${editId}`, {
+          method: 'PUT',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+      } else {
+        r = await fetch(`${API}/add`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+      }
+
+      if (r.ok) {
+        toast(editId ? 'Question updated! ✅' : 'Question added! ✅', 'success');
+        resetForm();
+        await loadQuestions();
+      } else {
+        const err = await r.json();
+        if (err.fieldErrors) {
+          const msgs = Object.entries(err.fieldErrors).map(([k,v]) => `${k}: ${v}`).join('\n');
+          toast('Validation error:\n' + msgs, 'error');
+        } else {
+          toast(err.message || 'Save failed', 'error');
+        }
+      }
+    } catch {
+      toast('Network error – is the server running?', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = editId ? '💾 Update Question' : '✅ Save Question';
+    }
+  }
+
+  // ── Delete ────────────────────────────────────────────────────────────────────
+  function confirmDelete(id) {
+    pendingDeleteId = id;
+    document.getElementById('delete-modal').classList.add('open');
+    document.getElementById('confirm-delete-btn').onclick = () => doDelete(id);
+  }
+
+  function closeDeleteModal() {
+    document.getElementById('delete-modal').classList.remove('open');
+    pendingDeleteId = null;
+  }
+
+  async function doDelete(id) {
+    closeDeleteModal();
+    try {
+      const r = await fetch(`${API}/delete/${id}`, { method: 'DELETE' });
+      if (r.ok) {
+        toast('Question deleted 🗑️', 'success');
+        await loadQuestions();
+      } else {
+        const err = await r.json();
+        toast(err.message || 'Delete failed', 'error');
+      }
+    } catch {
+      toast('Network error', 'error');
+    }
+  }
+
+  // ── Close modal on overlay click ──────────────────────────────────────────────
+  document.getElementById('delete-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteModal();
+  });
+
+  // ── Init ──────────────────────────────────────────────────────────────────────
+  checkHealth();
+  loadQuestions();
+  setInterval(checkHealth, 30000); // re-check health every 30s
+</script>
+</body>
+</html>

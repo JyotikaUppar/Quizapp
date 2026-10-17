@@ -3,721 +3,1880 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quiz Manager – Spring Boot Dashboard</title>
-  <meta name="description" content="Manage quiz questions with a beautiful dashboard powered by Spring Boot REST API" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <title>QuizVerse | 70s Retro Quiz-Show Arena</title>
+  <meta name="description" content="Step right up! 70s Retro Quiz Show Assessment Platform powered by Spring Boot REST API and Java 17." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Shrikhand&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
   <style>
-    /* ── Reset & Base ─────────────────────────────────────────────────────── */
+    /* ═════════════════════════════════════════════════════════════════════════ */
+    /* 70s RETRO QUIZ SHOW DESIGN TOKENS (DIRECTION A)                         */
+    /* ═════════════════════════════════════════════════════════════════════════ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:           #0d0f1a;
-      --surface:      #141828;
-      --surface2:     #1c2235;
-      --surface3:     #232b42;
-      --border:       rgba(255,255,255,0.07);
-      --accent:       #6c63ff;
-      --accent2:      #a78bfa;
-      --accent-glow:  rgba(108,99,255,0.25);
-      --green:        #34d399;
-      --yellow:       #fbbf24;
-      --red:          #f87171;
-      --text:         #e8eaf6;
-      --text-muted:   #8892b0;
-      --radius:       14px;
-      --radius-sm:    8px;
-      --shadow:       0 4px 32px rgba(0,0,0,0.5);
-      --transition:   0.22s cubic-bezier(0.4,0,0.2,1);
+      --font-display: 'Shrikhand', cursive, serif;
+      --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'DM Mono', monospace;
+
+      /* 70s Retro Palette */
+      --bg-canvas: #F5E9D3;            /* Cream background */
+      --bg-surface: #FFF8EA;           /* Card background */
+      --bg-surface-elevated: #FFFDF7;  /* Elevated panel */
+      --bg-surface-hover: #FCEFD2;     /* Card hover */
+      --border-color: #2B1D14;         /* Deep Retro Brown */
+      --text-primary: #2B1D14;         /* Deep Retro Brown text */
+      --text-secondary: #5C4533;       /* Warm Brown subtitle */
+      --text-tertiary: #856B55;        /* Muted Brown */
+
+      /* 70s Quiz Show Accents */
+      --orange: #E2662B;               /* Burnt Orange */
+      --orange-hover: #CC551C;
+      --mustard: #EBB02D;              /* Mustard Gold */
+      --mustard-hover: #D89F20;
+      --teal: #2A8C82;                 /* Retro Teal */
+      --teal-hover: #22756D;
+      --avocado: #7A8B3A;              /* Avocado Green */
+      --avocado-hover: #697830;
+      --success: #4C8C4A;              /* Retro Green */
+      --danger: #C0392B;               /* Vintage Red Buzzer */
+
+      /* Borders & Neobrutal Hard Offset Shadows */
+      --border-thick: 2.5px solid #2B1D14;
+      --border-thin: 1.5px solid #2B1D14;
+      --shadow-retro: 4px 4px 0px #2B1D14;
+      --shadow-retro-sm: 2px 2px 0px #2B1D14;
+      --shadow-retro-lg: 6px 6px 0px #2B1D14;
+      --shadow-retro-btn: 3px 3px 0px #2B1D14;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-pill: 9999px;
+      --transition: 0.12s cubic-bezier(0.2, 0, 0, 1);
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: var(--font-sans);
+      background-color: var(--bg-canvas);
+      background-image: radial-gradient(#2B1D14 0.75px, transparent 0.75px);
+      background-size: 24px 24px;
+      color: var(--text-primary);
       min-height: 100vh;
       overflow-x: hidden;
+      line-height: 1.5;
+      font-size: 14.5px;
     }
 
-    /* ── Animated BG ──────────────────────────────────────────────────────── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(108,99,255,0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(167,139,250,0.08) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
+    /* 70s Rainbow Striped Accent Banner */
+    .retro-rainbow-stripe {
+      height: 10px;
+      width: 100%;
+      background: linear-gradient(90deg, 
+        #E2662B 0% 25%, 
+        #EBB02D 25% 50%, 
+        #7A8B3A 50% 75%, 
+        #2A8C82 75% 100%
+      );
+      border-bottom: var(--border-thick);
+      position: sticky;
+      top: 0;
+      z-index: 90;
     }
 
-    /* ── Layout ───────────────────────────────────────────────────────────── */
-    .app-layout { position: relative; z-index: 1; max-width: 1300px; margin: 0 auto; padding: 0 1.5rem; }
+    .app-layout {
+      position: relative;
+      z-index: 1;
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 1.5rem 1.5rem 4rem;
+    }
 
-    /* ── Header ───────────────────────────────────────────────────────────── */
+    /* ── Header Bar ──────────────────────────────────────────────────────── */
     header {
+      background: var(--bg-surface);
+      border: var(--border-thick);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-retro);
+      padding: 1rem 1.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1.5rem 0;
-      border-bottom: 1px solid var(--border);
       gap: 1rem;
       flex-wrap: wrap;
+      margin-bottom: 2rem;
     }
 
-    .logo {
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      background: var(--orange);
+      border: var(--border-thick);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-retro-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFF8EA;
+      font-size: 1.5rem;
+      transform: rotate(-3deg);
+      transition: transform 0.2s ease;
+    }
+    .brand:hover .brand-logo {
+      transform: rotate(3deg) scale(1.05);
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      color: var(--text-primary);
+      line-height: 1.1;
+      letter-spacing: 0.02em;
+      text-shadow: 1px 1px 0px var(--mustard);
+    }
+
+    .brand-subtitle {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Nav Tabs (70s Pill Radio Buttons) ─────────────────────────────────── */
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--bg-canvas);
+      border: var(--border-thick);
+      border-radius: var(--radius-pill);
+      padding: 0.35rem;
+      box-shadow: var(--shadow-retro-sm);
+    }
+
+    .nav-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 1.1rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      background: transparent;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      font-family: var(--font-sans);
+    }
+
+    .nav-tab:hover {
+      background: rgba(43, 29, 20, 0.06);
+    }
+
+    .nav-tab.active {
+      background: var(--mustard);
+      border: 2px solid var(--border-color);
+      box-shadow: 2px 2px 0px var(--border-color);
+      transform: translateY(-1px);
+    }
+
+    .nav-tab-count {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.1rem 0.45rem;
+      background: #FFF8EA;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-pill);
+    }
+
+    /* ── Header Actions ──────────────────────────────────────────────────── */
+    .header-actions {
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
 
-    .logo-icon {
-      width: 42px; height: 42px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem;
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-
-    .logo h1 {
-      font-size: 1.35rem;
-      font-weight: 700;
-      background: linear-gradient(90deg, #fff 0%, var(--accent2) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .logo span { font-size: 0.75rem; color: var(--text-muted); display: block; font-weight: 400; }
-
-    /* Health pill */
     #health-pill {
-      display: flex; align-items: center; gap: 0.5rem;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 0.4rem 1rem;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: #FFF8EA;
+      border: var(--border-thick);
+      border-radius: var(--radius-pill);
+      padding: 0.35rem 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-retro-sm);
     }
 
     .health-dot {
-      width: 8px; height: 8px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
-      background: var(--text-muted);
-      animation: pulse-dot 2s infinite;
+      border: 1.5px solid var(--border-color);
+      background: var(--text-tertiary);
+    }
+    .health-dot.up { background: var(--success); }
+    .health-dot.down { background: var(--danger); }
+
+    /* User Profile Chip */
+    .user-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #FFF8EA;
+      border: var(--border-thick);
+      border-radius: var(--radius-pill);
+      padding: 0.35rem 0.85rem 0.35rem 0.5rem;
+      box-shadow: var(--shadow-retro-sm);
     }
 
-    .health-dot.up { background: var(--green); }
-    .health-dot.down { background: var(--red); animation: none; }
-
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.72rem;
+      font-weight: 700;
+      border: 2px solid var(--border-color);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .role-badge.role-admin {
+      background: var(--orange);
+      color: #FFF8EA;
+    }
+    .role-badge.role-student {
+      background: var(--teal);
+      color: #FFF8EA;
     }
 
-    /* ── Stats Bar ────────────────────────────────────────────────────────── */
+    .user-name {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* ── 70s Pill Buttons that Press Down ─────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.55rem 1.25rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: var(--border-thick);
+      box-shadow: var(--shadow-retro-btn);
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+      text-decoration: none;
+      font-family: var(--font-sans);
+    }
+    .btn:hover:not(:disabled) {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px var(--border-color);
+    }
+    .btn:active:not(:disabled) {
+      transform: translate(3px, 3px);
+      box-shadow: 0px 0px 0px var(--border-color);
+    }
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .btn-primary {
+      background: var(--orange);
+      color: #FFF8EA;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--orange-hover);
+    }
+
+    .btn-mustard {
+      background: var(--mustard);
+      color: var(--text-primary);
+    }
+    .btn-mustard:hover:not(:disabled) {
+      background: var(--mustard-hover);
+    }
+
+    .btn-teal {
+      background: var(--teal);
+      color: #FFF8EA;
+    }
+    .btn-teal:hover:not(:disabled) {
+      background: var(--teal-hover);
+    }
+
+    .btn-secondary {
+      background: #FFF8EA;
+      color: var(--text-primary);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: #FCEFD2;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-primary);
+      box-shadow: none;
+      border: 2px solid transparent;
+    }
+    .btn-ghost:hover:not(:disabled) {
+      background: rgba(43, 29, 20, 0.06);
+      border-color: var(--border-color);
+      box-shadow: 2px 2px 0px var(--border-color);
+    }
+    .btn-ghost:active:not(:disabled) {
+      transform: translate(2px, 2px);
+      box-shadow: 0 0 0;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #FFF8EA;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #FFF8EA;
+    }
+
+    .btn-sm { padding: 0.35rem 0.85rem; font-size: 0.78rem; }
+    .btn-lg { padding: 0.8rem 1.8rem; font-size: 1rem; }
+    .btn-icon { padding: 0.4rem; width: 36px; height: 36px; border-radius: 50%; }
+
+    /* ── Tab Views ────────────────────────────────────────────────────────── */
+    .tab-view { display: none; margin-top: 1.5rem; animation: popIn 0.15s ease-out; }
+    .tab-view.active { display: block; }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Stats Bar (70s Stage Cards) ──────────────────────────────────────── */
     .stats-bar {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1rem;
-      margin: 2rem 0;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
     }
 
     .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.25rem 1.5rem;
+      background: var(--bg-surface);
+      border: var(--border-thick);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
       display: flex;
       align-items: center;
-      gap: 1rem;
-      transition: var(--transition);
-      cursor: default;
+      gap: 1.15rem;
+      box-shadow: var(--shadow-retro);
+      position: relative;
+      overflow: hidden;
     }
-
-    .stat-card:hover {
-      border-color: var(--accent);
-      box-shadow: 0 0 20px var(--accent-glow);
-      transform: translateY(-2px);
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: var(--mustard);
+      border-bottom: 1.5px solid var(--border-color);
     }
+    .stat-card.stat-orange::before { background: var(--orange); }
+    .stat-card.stat-teal::before   { background: var(--teal); }
+    .stat-card.stat-avocado::before{ background: var(--avocado); }
 
     .stat-icon {
-      font-size: 1.6rem;
-      width: 48px; height: 48px;
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
+      width: 48px;
+      height: 48px;
+      border: var(--border-thick);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: var(--shadow-retro-sm);
       flex-shrink: 0;
     }
+    .stat-icon.primary { background: var(--orange); color: #FFF8EA; }
+    .stat-icon.green   { background: var(--avocado); color: #FFF8EA; }
+    .stat-icon.yellow  { background: var(--mustard); color: var(--text-primary); }
+    .stat-icon.red     { background: var(--danger); color: #FFF8EA; }
 
-    .stat-icon.purple { background: rgba(108,99,255,0.15); }
-    .stat-icon.green  { background: rgba(52,211,153,0.15); }
-    .stat-icon.yellow { background: rgba(251,191,36,0.15); }
-    .stat-icon.red    { background: rgba(248,113,113,0.15); }
-
-    .stat-value { font-size: 1.8rem; font-weight: 800; line-height: 1; }
-    .stat-label { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 1.9rem;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 0.3rem;
+    }
 
     /* ── Main Grid ────────────────────────────────────────────────────────── */
     .main-grid {
       display: grid;
-      grid-template-columns: 1fr 380px;
+      grid-template-columns: 1fr 390px;
       gap: 1.5rem;
-      margin-bottom: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 1080px) {
+      .main-grid { grid-template-columns: 1fr; }
     }
 
-    @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
-
-    /* ── Panel ────────────────────────────────────────────────────────────── */
+    /* 70s Panels */
     .panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      background: var(--bg-surface);
+      border: var(--border-thick);
+      border-radius: var(--radius-lg);
       overflow: hidden;
+      box-shadow: var(--shadow-retro);
     }
 
     .panel-header {
+      padding: 1.15rem 1.4rem;
+      border-bottom: var(--border-thick);
+      background: #FFFDF7;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid var(--border);
       gap: 0.75rem;
       flex-wrap: wrap;
     }
 
     .panel-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: 0.02em;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .input-group {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-input, select, input[type="text"], input[type="password"], input[type="email"], input[type="number"] {
+      background: #FFFDF7;
+      border: var(--border-thick);
+      border-radius: var(--radius-pill);
+      color: var(--text-primary);
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      outline: none;
+      box-shadow: 2px 2px 0px var(--border-color);
+      transition: var(--transition);
+    }
+    .form-input:focus, select:focus, input:focus {
+      border-color: var(--orange);
+      box-shadow: 3px 3px 0px var(--orange);
+    }
+
+    /* ── Table (Retro Quiz Contestant Board) ──────────────────────────────── */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    thead th {
+      background: #FCEFD2;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      padding: 0.85rem 1.15rem;
+      border-bottom: var(--border-thick);
+      white-space: nowrap;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+    }
+
+    tbody tr {
+      border-bottom: 1.5px solid rgba(43, 29, 20, 0.15);
+      transition: var(--transition);
+    }
+    tbody tr:hover {
+      background: #FCEFD2;
+    }
+
+    tbody td {
+      padding: 0.95rem 1.15rem;
+      vertical-align: middle;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .td-title {
+      max-width: 320px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 600;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 700;
+      white-space: nowrap;
+      border: 1.5px solid var(--border-color);
+      box-shadow: 1px 1px 0px var(--border-color);
+    }
+    .badge-easy { background: #A7D7C5; color: #184D3F; }
+    .badge-medium { background: #FDE68A; color: #78350F; }
+    .badge-hard { background: #FECACA; color: #991B1B; }
+    .badge-default { background: #FFF8EA; color: var(--text-primary); }
+
+    .cat-pill {
+      display: inline-block;
+      padding: 0.25rem 0.65rem;
+      background: var(--mustard);
+      color: var(--text-primary);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-pill);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 700;
+      box-shadow: 1px 1px 0px var(--border-color);
+    }
+
+    /* Pagination */
+    .pagination-bar {
+      padding: 0.85rem 1.25rem;
+      border-top: var(--border-thick);
+      background: #FFFDF7;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+    }
+    .page-btn {
+      background: #FFF8EA;
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: var(--radius-pill);
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 2px 2px 0px var(--border-color);
+      transition: var(--transition);
+      font-family: var(--font-mono);
+    }
+    .page-btn:hover:not(:disabled) {
+      background: var(--mustard);
+    }
+    .page-btn.active {
+      background: var(--orange);
+      color: #FFF8EA;
+    }
+    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+    /* Form Panel */
+    .form-panel-body {
+      padding: 1.4rem;
+    }
+    .form-grid {
+      display: grid;
+      gap: 1.15rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .form-group label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
+
+    /* ── Quizzes Hub (70s Contestant Stage) ─────────────────────────────────── */
+    .quiz-hub-header {
+      background: var(--bg-surface);
+      border: var(--border-thick);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-retro);
+      padding: 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .quiz-hub-header::after {
+      content: 'SHOWTIME ★';
+      position: absolute;
+      right: 1.5rem;
+      top: 0.75rem;
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      color: rgba(43, 29, 20, 0.05);
+      pointer-events: none;
+    }
+
+    .quiz-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .quiz-card {
+      background: var(--bg-surface);
+      border: var(--border-thick);
+      border-radius: var(--radius-lg);
+      padding: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1.15rem;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: var(--shadow-retro);
+      position: relative;
+    }
+    .quiz-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-retro-lg);
+      background: #FFFDF7;
+    }
+
+    .quiz-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .quiz-badge-id {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      background: #FCEFD2;
+      padding: 0.2rem 0.5rem;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-pill);
+    }
+
+    .quiz-card-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: var(--text-primary);
+      margin-top: 0.35rem;
+      margin-bottom: 0.65rem;
+      line-height: 1.25;
+      letter-spacing: 0.01em;
+    }
+
+    .quiz-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .quiz-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-top: 0.85rem;
+      border-top: 2px dashed rgba(43, 29, 20, 0.2);
+    }
+
+    /* ── Empty State ──────────────────────────────────────────────────────── */
+    .empty-state {
+      padding: 3.5rem 1.5rem;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+    .empty-icon {
+      font-size: 2.8rem;
+      margin-bottom: 0.75rem;
+      color: var(--orange);
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════════ */
+    /* 70s INTERACTIVE QUIZ ARENA (FULL SCREEN PLAYER)                         */
+    /* ═════════════════════════════════════════════════════════════════════════ */
+    #arena-view {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(43, 29, 20, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      overflow-y: auto;
+      padding: 2rem 1.5rem;
+    }
+    #arena-view.open { display: flex; align-items: center; justify-content: center; }
+
+    .arena-container {
+      width: 100%;
+      max-width: 880px;
+      background: #FFF8EA;
+      border: var(--border-thick);
+      border-radius: var(--radius-lg);
+      box-shadow: 8px 8px 0px #000;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .arena-header {
+      padding: 1.25rem 1.75rem;
+      border-bottom: var(--border-thick);
+      background: #FFFDF7;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .arena-quiz-title {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      letter-spacing: 0.02em;
+    }
+
+    /* Retro Countdown Clock Dial */
+    .timer-widget {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #FCEFD2;
+      border: var(--border-thick);
+      padding: 0.4rem 0.95rem;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      box-shadow: 2px 2px 0px var(--border-color);
+    }
+
+    /* 70s Bulb-Style Progress Bar (Stage Lights) */
+    .bulb-bar-wrapper {
+      padding: 0.6rem 1.75rem;
+      background: #FCEFD2;
+      border-bottom: var(--border-thick);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .bulb-track {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+    .bulb-node {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 2px solid var(--border-color);
+      background: #FFF8EA;
+      box-shadow: 1px 1px 0px var(--border-color);
+      transition: all 0.15s ease;
+    }
+    .bulb-node.lit {
+      background: var(--mustard);
+      box-shadow: 0 0 6px rgba(235, 176, 45, 0.9);
+      transform: scale(1.1);
+    }
+    .bulb-node.current {
+      background: var(--orange);
+      box-shadow: 0 0 8px rgba(226, 102, 43, 0.9);
+      transform: scale(1.3);
+    }
+
+    /* Stage Lights Question Navigator */
+    .palette-strip {
+      padding: 0.85rem 1.75rem;
+      background: #FFFDF7;
+      border-bottom: var(--border-thick);
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+    }
+
+    .palette-node {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-pill);
+      background: #FFF8EA;
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--border-color);
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+    .palette-node.active {
+      background: var(--orange);
+      color: #FFF8EA;
+      transform: translateY(-2px);
+    }
+    .palette-node.answered {
+      background: var(--mustard);
+      color: var(--text-primary);
+    }
+
+    .arena-body {
+      padding: 2rem 1.75rem;
+    }
+
+    .arena-question-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.15rem;
+    }
+
+    .arena-question-number {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .arena-question-text {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.4;
+      margin-bottom: 1.85rem;
+    }
+
+    .options-grid {
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .option-btn {
+      background: #FFFDF7;
+      border: var(--border-thick);
+      border-radius: var(--radius-pill);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.15rem;
+      cursor: pointer;
+      box-shadow: 3px 3px 0px var(--border-color);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+      text-align: left;
       font-size: 0.95rem;
       font-weight: 600;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+    }
+    .option-btn:hover {
+      background: #FCEFD2;
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px var(--border-color);
+    }
+    .option-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px var(--border-color);
+    }
+    .option-btn.selected {
+      background: var(--mustard);
+      border-color: var(--border-color);
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px var(--border-color);
+    }
+
+    .option-letter {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #FFF8EA;
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.85rem;
+      box-shadow: 1px 1px 0px var(--border-color);
+      flex-shrink: 0;
+    }
+    .option-btn.selected .option-letter {
+      background: var(--orange);
+      color: #FFF8EA;
+    }
+
+    .arena-footer {
+      padding: 1.25rem 1.75rem;
+      border-top: var(--border-thick);
+      background: #FFFDF7;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════════ */
+    /* 70s TICKET-STUB QUIZ RESULTS SCREEN                                     */
+    /* ═════════════════════════════════════════════════════════════════════════ */
+    #result-view {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(43, 29, 20, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 110;
+      overflow-y: auto;
+      padding: 2.5rem 1.5rem;
+    }
+    #result-view.open { display: flex; align-items: center; justify-content: center; }
+
+    .result-container {
+      width: 100%;
+      max-width: 800px;
+      background: #FFF8EA;
+      border: var(--border-thick);
+      border-radius: var(--radius-lg);
+      box-shadow: 8px 8px 0px #000;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Ticket Perforations */
+    .ticket-perforation {
+      border-top: 3px dashed var(--border-color);
+      position: relative;
+      margin: 0;
+    }
+    .ticket-perforation::before, .ticket-perforation::after {
+      content: '';
+      position: absolute;
+      top: -14px;
+      width: 28px;
+      height: 28px;
+      background: rgba(43, 29, 20, 0.85);
+      border: 3px solid var(--border-color);
+      border-radius: 50%;
+    }
+    .ticket-perforation::before { left: -16px; }
+    .ticket-perforation::after  { right: -16px; }
+
+    .result-hero {
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+      background: #FFFDF7;
+      position: relative;
+    }
+
+    /* Stamped Sticker Badge */
+    .retro-stamp {
+      display: inline-block;
+      padding: 0.35rem 0.95rem;
+      border: 2.5px solid var(--orange);
+      border-radius: var(--radius-sm);
+      color: var(--orange);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      transform: rotate(-4deg);
+      margin-bottom: 0.75rem;
+    }
+
+    .result-title {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      color: var(--text-primary);
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+    }
+    .result-remark {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-top: 0.35rem;
+    }
+
+    .result-score-badge {
+      display: inline-block;
+      margin: 1.75rem 0 1.25rem;
+      padding: 1.25rem 3rem;
+      background: var(--mustard);
+      border: var(--border-thick);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-retro);
+    }
+    .score-big {
+      font-family: var(--font-display);
+      font-size: 3.5rem;
+      color: var(--text-primary);
+      line-height: 1;
+      text-shadow: 2px 2px 0px #FFF8EA;
+    }
+    .score-pct {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 0.45rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .result-stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 1.75rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .result-stat-box {
+      text-align: center;
+      background: #FFF8EA;
+      border: var(--border-thick);
+      padding: 0.65rem 1.25rem;
+      border-radius: var(--radius-md);
+      box-shadow: 2px 2px 0px var(--border-color);
+    }
+    .result-stat-val {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      color: var(--text-primary);
+    }
+    .result-stat-lbl {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .review-panel {
+      padding: 2rem;
+      background: #FFF8EA;
+    }
+    .review-header {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      color: var(--text-primary);
+      margin-bottom: 1.25rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
-    .panel-body { padding: 1.5rem; }
-
-    /* ── Toolbar ──────────────────────────────────────────────────────────── */
-    .toolbar {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      align-items: center;
+    .review-list {
+      display: grid;
+      gap: 0.95rem;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+    .review-item {
+      padding: 1.15rem;
+      border-radius: var(--radius-md);
+      border: var(--border-thick);
+      box-shadow: 2px 2px 0px var(--border-color);
+      font-size: 0.88rem;
+    }
+    .review-item.correct {
+      background: #E8F5E9;
+      border-color: var(--success);
+    }
+    .review-item.incorrect {
+      background: #FFEBEE;
+      border-color: var(--danger);
     }
 
-    .input-group {
-      position: relative;
-    }
-
-    .input-group input,
-    .input-group select {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-size: 0.82rem;
-      font-family: inherit;
-      padding: 0.5rem 0.9rem;
-      transition: var(--transition);
-      outline: none;
-    }
-
-    .input-group input:focus,
-    .input-group select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-    }
-
-    .input-group select option { background: var(--surface2); }
-
-    /* ── Buttons ──────────────────────────────────────────────────────────── */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.5rem 1.1rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.82rem;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      border: none;
-      transition: var(--transition);
-      text-decoration: none;
-      white-space: nowrap;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
-      color: #fff;
-      box-shadow: 0 2px 12px var(--accent-glow);
-    }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
-
-    .btn-ghost {
-      background: var(--surface2);
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-    }
-    .btn-ghost:hover { color: var(--text); border-color: var(--accent); }
-
-    .btn-danger {
-      background: rgba(248,113,113,0.12);
-      color: var(--red);
-      border: 1px solid rgba(248,113,113,0.2);
-    }
-    .btn-danger:hover { background: rgba(248,113,113,0.22); }
-
-    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.75rem; }
-    .btn-icon { padding: 0.35rem 0.5rem; }
-
-    /* ── Table ────────────────────────────────────────────────────────────── */
-    .table-wrap { overflow-x: auto; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.83rem;
-    }
-
-    thead th {
-      text-align: left;
-      padding: 0.75rem 1rem;
-      color: var(--text-muted);
-      font-weight: 600;
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-
-    tbody tr {
-      border-bottom: 1px solid var(--border);
-      transition: var(--transition);
-    }
-
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: var(--surface2); }
-
-    td {
-      padding: 0.85rem 1rem;
-      vertical-align: middle;
-    }
-
-    .td-title {
-      max-width: 280px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-weight: 500;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 0.22rem 0.65rem;
-      border-radius: 999px;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
-
-    .badge-easy   { background: rgba(52,211,153,0.15); color: var(--green); }
-    .badge-medium { background: rgba(251,191,36,0.15);  color: var(--yellow); }
-    .badge-hard   { background: rgba(248,113,113,0.15); color: var(--red); }
-    .badge-default{ background: rgba(255,255,255,0.08); color: var(--text-muted); }
-
-    .cat-pill {
-      display: inline-block;
-      padding: 0.2rem 0.6rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.7rem;
-      background: rgba(108,99,255,0.15);
-      color: var(--accent2);
-    }
-
-    /* ── Pagination ───────────────────────────────────────────────────────── */
-    .pagination {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      padding: 1.25rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .page-btn {
-      width: 32px; height: 32px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      background: var(--surface2);
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      font-family: inherit;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: var(--transition);
-    }
-
-    .page-btn:hover, .page-btn.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-    }
-
-    .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-    /* ── Form ─────────────────────────────────────────────────────────────── */
-    .form-grid { display: flex; flex-direction: column; gap: 1rem; }
-
-    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
-
-    .form-group label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-size: 0.84rem;
-      font-family: inherit;
-      padding: 0.65rem 0.9rem;
-      transition: var(--transition);
-      outline: none;
-      width: 100%;
-      resize: none;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-    }
-
-    .form-group select option { background: var(--surface2); }
-
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-
-    .form-error { font-size: 0.72rem; color: var(--red); margin-top: 0.2rem; display: none; }
-    .form-error.show { display: block; }
-
-    /* ── Toast ────────────────────────────────────────────────────────────── */
-    #toast-container {
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-    }
-
-    .toast {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
-      border-radius: var(--radius-sm);
-      padding: 0.85rem 1.2rem;
-      font-size: 0.83rem;
-      min-width: 260px;
-      max-width: 360px;
-      box-shadow: var(--shadow);
-      animation: slideIn 0.3s ease, fadeOut 0.4s ease 2.6s forwards;
-    }
-
-    .toast.success { border-left-color: var(--green); }
-    .toast.error   { border-left-color: var(--red);   }
-    .toast.warn    { border-left-color: var(--yellow); }
-
-    @keyframes slideIn { from { opacity:0; transform: translateX(30px); } to { opacity:1; transform: translateX(0); } }
-    @keyframes fadeOut { from { opacity:1; } to { opacity:0; transform: translateX(30px); } }
-
-    /* ── Empty / Loading states ───────────────────────────────────────────── */
-    .empty-state {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: var(--text-muted);
-    }
-
-    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 0.75rem; opacity: 0.4; }
-    .empty-state p { font-size: 0.9rem; }
-
-    .skeleton {
-      background: linear-gradient(90deg, var(--surface2) 25%, var(--surface3) 50%, var(--surface2) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
-      border-radius: 4px;
-      height: 1rem;
-    }
-
-    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-    /* ── Modal ────────────────────────────────────────────────────────────── */
+    /* ── Modals ───────────────────────────────────────────────────────────── */
     .modal-overlay {
+      display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.7);
+      background: rgba(43, 29, 20, 0.8);
       backdrop-filter: blur(4px);
-      z-index: 100;
-      display: none;
+      z-index: 150;
       align-items: center;
       justify-content: center;
-      padding: 1rem;
+      padding: 1.5rem;
     }
-
-    .modal-overlay.open { display: flex; animation: fadeInOverlay 0.2s ease; }
-
-    @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+    .modal-overlay.open { display: flex; }
 
     .modal {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      max-width: 500px;
+      background: #FFF8EA;
+      border: var(--border-thick);
+      border-radius: var(--radius-lg);
       width: 100%;
-      box-shadow: var(--shadow);
-      animation: scaleIn 0.2s ease;
+      max-width: 500px;
+      box-shadow: 8px 8px 0px #000;
+      overflow: hidden;
+      animation: popIn 0.15s ease-out;
     }
 
-    @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-    .modal-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .modal-desc { font-size: 0.84rem; color: var(--text-muted); margin-bottom: 1.5rem; }
-    .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; }
-
-    /* ── Quick links ──────────────────────────────────────────────────────── */
-    .quick-links {
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: var(--border-thick);
+      background: #FFFDF7;
       display: flex;
-      gap: 0.6rem;
-      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--text-primary);
+    }
+    .modal-body {
+      padding: 1.5rem;
+    }
+    .modal-actions {
+      padding: 1.15rem 1.5rem;
+      border-top: var(--border-thick);
+      background: #FFFDF7;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    /* Auth Modal Tabs */
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      background: #FCEFD2;
+      border: var(--border-thick);
+      padding: 0.35rem;
+      border-radius: var(--radius-pill);
       margin-bottom: 1.5rem;
     }
+    .auth-tab-btn {
+      background: transparent;
+      border: 2px solid transparent;
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.5rem;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font-sans);
+    }
+    .auth-tab-btn.active {
+      background: var(--orange);
+      color: #FFF8EA;
+      border-color: var(--border-color);
+      box-shadow: 2px 2px 0px var(--border-color);
+    }
 
-    .quick-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.4rem 0.9rem;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 500;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      text-decoration: none;
+    .role-select-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+      margin-top: 0.35rem;
+    }
+    .role-option {
+      border: var(--border-thick);
+      background: #FFFDF7;
+      border-radius: var(--radius-md);
+      padding: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      box-shadow: 2px 2px 0px var(--border-color);
       transition: var(--transition);
     }
-
-    .quick-link:hover {
-      border-color: var(--accent);
-      color: var(--accent2);
+    .role-option:hover {
+      background: #FCEFD2;
     }
+    .role-option.selected {
+      background: var(--mustard);
+      transform: translateY(-2px);
+      box-shadow: 3px 3px 0px var(--border-color);
+    }
+    .role-option input { display: none; }
+    .role-option strong { font-size: 0.85rem; color: var(--text-primary); }
+    .role-option span { font-size: 0.74rem; color: var(--text-secondary); line-height: 1.3; }
 
-    /* ── Scrollbar ────────────────────────────────────────────────────────── */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+    /* ── Toast Notifications (Retro Quiz Flash Cards) ─────────────────────── */
+    #toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .toast {
+      background: #FFF8EA;
+      border: var(--border-thick);
+      color: var(--text-primary);
+      padding: 0.85rem 1.35rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.88rem;
+      font-weight: 700;
+      box-shadow: 4px 4px 0px var(--border-color);
+      animation: popIn 0.2s ease-out;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .toast.success { background: #E8F5E9; border-color: var(--success); }
+    .toast.error   { background: #FFEBEE; border-color: var(--danger); }
+    .toast.info    { background: #FFF8EA; }
+
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 120;
+    }
   </style>
 </head>
 <body>
+<div class="retro-rainbow-stripe"></div>
+<canvas id="confetti-canvas"></canvas>
+
 <div class="app-layout">
 
-  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <!-- ── 70s Global Application Header ───────────────────────────────────── -->
   <header>
-    <div class="logo">
-      <div class="logo-icon">🧠</div>
+    <a href="#" class="brand" onclick="onBrandClick(event)">
+      <div class="brand-logo">
+        <i class="ri-trophy-line"></i>
+      </div>
       <div>
-        <h1>Quiz Manager</h1>
-        <span>Spring Boot Dashboard</span>
+        <div class="brand-title">QuizVerse '74</div>
+        <div class="brand-subtitle">The Grand Quiz-Show Arena</div>
       </div>
-    </div>
-    <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
-      <div id="health-pill">
+    </a>
+
+    <!-- Top Navigation Tabs -->
+    <nav class="nav-tabs" id="main-nav-tabs">
+      <button class="nav-tab" id="tab-btn-questions" onclick="switchTab('questions')">
+        <i class="ri-book-open-line"></i> Questions <span class="nav-tab-count" id="nav-q-count">0</span>
+      </button>
+      <button class="nav-tab active" id="tab-btn-quizzes" onclick="switchTab('quizzes')">
+        <i class="ri-trophy-line"></i> Assessments <span class="nav-tab-count" id="nav-quiz-count">0</span>
+      </button>
+      <button class="nav-tab" id="tab-btn-analytics" onclick="switchTab('analytics')">
+        <i class="ri-bar-chart-2-line"></i> Show Stats
+      </button>
+    </nav>
+
+    <!-- Header Actions & Identity -->
+    <div class="header-actions">
+      <div id="health-pill" title="Spring Boot Actuator Health Status">
         <div class="health-dot" id="health-dot"></div>
-        <span id="health-text">Checking…</span>
+        <span id="health-text">ON AIR</span>
       </div>
-      <a href="/swagger-ui.html" target="_blank" class="btn btn-ghost">📄 Swagger UI</a>
-      <a href="/actuator/health" target="_blank" class="btn btn-ghost">🩺 Actuator</a>
+
+      <!-- Auth profile chip (Rendered dynamically) -->
+      <div id="auth-actions"></div>
     </div>
   </header>
 
-  <!-- ── Stats ──────────────────────────────────────────────────────────── -->
-  <div class="stats-bar">
-    <div class="stat-card">
-      <div class="stat-icon purple">📚</div>
-      <div>
-        <div class="stat-value" id="stat-total">–</div>
-        <div class="stat-label">Total Questions</div>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon green">🟢</div>
-      <div>
-        <div class="stat-value" id="stat-easy">–</div>
-        <div class="stat-label">Easy</div>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon yellow">🟡</div>
-      <div>
-        <div class="stat-value" id="stat-medium">–</div>
-        <div class="stat-label">Medium</div>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon red">🔴</div>
-      <div>
-        <div class="stat-value" id="stat-hard">–</div>
-        <div class="stat-label">Hard</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Quick Links ────────────────────────────────────────────────────── -->
-  <div class="quick-links">
-    <a href="/swagger-ui.html" target="_blank" class="quick-link">🔗 Swagger UI</a>
-    <a href="/actuator/health" target="_blank" class="quick-link">💚 /actuator/health</a>
-    <a href="/actuator/info" target="_blank" class="quick-link">ℹ️ /actuator/info</a>
-    <a href="/actuator/metrics" target="_blank" class="quick-link">📊 /actuator/metrics</a>
-    <a href="/api-docs" target="_blank" class="quick-link">📋 OpenAPI JSON</a>
-  </div>
-
-  <!-- ── Main Grid ──────────────────────────────────────────────────────── -->
-  <div class="main-grid">
-
-    <!-- Questions Table Panel -->
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">📋 All Questions</div>
-        <div class="toolbar">
-          <div class="input-group">
-            <input id="filter-category" type="text" placeholder="Filter by category…" style="width:160px;" oninput="applyFilters()" />
-          </div>
-          <div class="input-group">
-            <select id="filter-difficulty" onchange="applyFilters()">
-              <option value="">All difficulties</option>
-              <option>Easy</option>
-              <option>Medium</option>
-              <option>Hard</option>
-            </select>
-          </div>
-          <button class="btn btn-ghost" onclick="loadQuestions()">🔄 Refresh</button>
-          <button class="btn btn-primary" onclick="openAddModal()">+ Add</button>
+  <!-- ═════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB 1: QUESTION BANK (TEACHERS CRUD / STUDENTS STUDY MODE)            -->
+  <!-- ═════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-view" id="view-questions">
+    <!-- Stats Row -->
+    <div class="stats-bar">
+      <div class="stat-card stat-orange">
+        <div class="stat-icon primary"><i class="ri-questionnaire-line"></i></div>
+        <div>
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-label">Total Questions</div>
         </div>
       </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Question</th>
-              <th>Category</th>
-              <th>Difficulty</th>
-              <th>Answer</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="questions-tbody">
-            <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⏳</div><p>Loading…</p></div></td></tr>
-          </tbody>
-        </table>
+      <div class="stat-card stat-avocado">
+        <div class="stat-icon green"><i class="ri-checkbox-circle-line"></i></div>
+        <div>
+          <div class="stat-value" id="stat-easy">0</div>
+          <div class="stat-label">Easy Questions</div>
+        </div>
       </div>
-
-      <div class="pagination" id="pagination"></div>
+      <div class="stat-card">
+        <div class="stat-icon yellow"><i class="ri-equalizer-line"></i></div>
+        <div>
+          <div class="stat-value" id="stat-medium">0</div>
+          <div class="stat-label">Medium Questions</div>
+        </div>
+      </div>
+      <div class="stat-card stat-teal">
+        <div class="stat-icon red"><i class="ri-fire-line"></i></div>
+        <div>
+          <div class="stat-value" id="stat-hard">0</div>
+          <div class="stat-label">Hard Questions</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Add/Edit Form Panel -->
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title" id="form-panel-title">➕ Add Question</div>
-        <button class="btn btn-ghost btn-sm" onclick="resetForm()">Clear</button>
-      </div>
-      <div class="panel-body">
-        <form id="question-form" class="form-grid" onsubmit="submitForm(event)">
-          <input type="hidden" id="edit-id" />
-
-          <div class="form-group">
-            <label>Question *</label>
-            <textarea id="f-title" rows="3" placeholder="Enter the question text…" required></textarea>
-            <span class="form-error" id="e-title"></span>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Option 1 *</label>
-              <input id="f-opt1" type="text" placeholder="Option A" required />
+    <!-- Questions Layout Grid -->
+    <div class="main-grid">
+      <!-- Table Panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="ri-table-line"></i> Question Repository</div>
+          <div class="toolbar">
+            <div class="input-group">
+              <input id="filter-search" type="text" placeholder="Search questions…" style="width:160px;" oninput="applyFilters()" />
             </div>
-            <div class="form-group">
-              <label>Option 2 *</label>
-              <input id="f-opt2" type="text" placeholder="Option B" required />
+            <div class="input-group">
+              <input id="filter-category" type="text" placeholder="Category…" style="width:110px;" oninput="applyFilters()" />
             </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Option 3</label>
-              <input id="f-opt3" type="text" placeholder="Option C" />
-            </div>
-            <div class="form-group">
-              <label>Option 4</label>
-              <input id="f-opt4" type="text" placeholder="Option D" />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Correct Answer *</label>
-            <input id="f-answer" type="text" placeholder="e.g. Paris" required />
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Category *</label>
-              <input id="f-category" type="text" placeholder="e.g. Java" required />
-            </div>
-            <div class="form-group">
-              <label>Difficulty *</label>
-              <select id="f-difficulty" required>
-                <option value="">Select…</option>
-                <option>Easy</option>
-                <option>Medium</option>
-                <option>Hard</option>
+            <div class="input-group">
+              <select id="filter-difficulty" onchange="applyFilters()">
+                <option value="">Difficulty</option>
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
               </select>
             </div>
           </div>
+        </div>
 
-          <button type="submit" class="btn btn-primary" id="form-submit-btn">
-            ✅ Save Question
-          </button>
-        </form>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>#ID</th>
+                <th>Question Title</th>
+                <th>Category</th>
+                <th>Difficulty</th>
+                <th>Correct Answer</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="questions-tbody">
+              <tr><td colspan="6"><div class="empty-state"><div class="empty-icon"><i class="ri-loader-4-line"></i></div><p>Tuning the TV set… loading questions…</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination-bar">
+          <span style="font-size:0.78rem;" id="pagination-info">Showing page 1</span>
+          <div id="pagination" style="display:flex;gap:0.35rem;"></div>
+        </div>
+      </div>
+
+      <!-- Add/Edit Question Panel (Teacher) -->
+      <div class="panel" id="question-form-panel">
+        <div class="panel-header">
+          <div class="panel-title" id="form-panel-title"><i class="ri-add-circle-line"></i> Add Question</div>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="resetForm()">Reset</button>
+        </div>
+
+        <div class="form-panel-body">
+          <form id="question-form" onsubmit="submitQuestionForm(event)" class="form-grid">
+            <input type="hidden" id="edit-id" />
+
+            <div class="form-group">
+              <label for="f-title">Question Title *</label>
+              <input id="f-title" type="text" placeholder="e.g. What is the GIL in Python?" required />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="f-opt1">Option 1 *</label>
+                <input id="f-opt1" type="text" placeholder="Option A" required />
+              </div>
+              <div class="form-group">
+                <label for="f-opt2">Option 2 *</label>
+                <input id="f-opt2" type="text" placeholder="Option B" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="f-opt3">Option 3 *</label>
+                <input id="f-opt3" type="text" placeholder="Option C" required />
+              </div>
+              <div class="form-group">
+                <label for="f-opt4">Option 4 *</label>
+                <input id="f-opt4" type="text" placeholder="Option D" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="f-answer">Correct Answer * (Must match one option)</label>
+              <input id="f-answer" type="text" placeholder="Exact match of option text" required />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="f-category">Category *</label>
+                <input id="f-category" type="text" placeholder="e.g. Java, Python, SpringBoot" required />
+              </div>
+              <div class="form-group">
+                <label for="f-difficulty">Difficulty *</label>
+                <select id="f-difficulty" required>
+                  <option value="Easy">Easy</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Hard">Hard</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg" id="form-submit-btn" style="width:100%;margin-top:0.5rem;">
+              <i class="ri-save-line"></i> Save Question
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Candidate Study Panel (Student Read-Only) -->
+      <div class="panel" id="candidate-study-panel" style="display:none;">
+        <div class="panel-header">
+          <div class="panel-title"><i class="ri-book-open-line"></i> Contestant Study Center</div>
+        </div>
+        <div class="form-panel-body" style="display:flex;flex-direction:column;gap:1.15rem;">
+          <div style="background:#FCEFD2;border:var(--border-thick);border-radius:var(--radius-md);padding:1.15rem;box-shadow:var(--shadow-retro-sm);">
+            <div style="font-family:var(--font-display);font-size:1.1rem;color:var(--text-primary);margin-bottom:0.35rem;display:flex;align-items:center;gap:0.4rem;">
+              <i class="ri-medal-line" style="color:var(--orange)"></i> Contestant Study Mode
+            </div>
+            <p style="font-size:0.82rem;color:var(--text-secondary);line-height:1.45;margin:0;">
+              Welcome, contestant! Review all Java, Python, and Spring Boot interview questions with verified answers. Take an assessment to test your skills!
+            </p>
+          </div>
+
+          <div>
+            <div style="font-size:0.85rem;font-weight:700;color:var(--text-primary);margin-bottom:0.6rem;text-transform:uppercase;">
+              Ready for the grand test?
+            </div>
+            <button class="btn btn-primary btn-lg" style="width:100%;" onclick="switchTab('quizzes')">
+              <i class="ri-play-circle-line"></i> Step Up to the Assessment Arena
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  </div><!-- /.main-grid -->
+  </div>
+
+  <!-- ═════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB 2: QUIZZES HUB (ACCESSIBLE TO STUDENTS & TEACHERS)                -->
+  <!-- ═════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-view active" id="view-quizzes">
+    <div class="quiz-hub-header">
+      <div>
+        <h2 style="font-family:var(--font-display);font-size:1.6rem;color:var(--text-primary);">
+          ★ The Grand Assessment Arena ★
+        </h2>
+        <p style="color:var(--text-secondary);font-size:0.88rem;margin-top:0.35rem;" id="quiz-hub-subtitle">
+          Choose your 20-question championship assessment! Answer like a champion, contestant!
+        </p>
+      </div>
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;" id="teacher-quiz-actions">
+        <button class="btn btn-mustard" onclick="startQuickRandomQuiz()">
+          <i class="ri-shuffle-line"></i> Mystery Challenge
+        </button>
+        <button class="btn btn-primary" onclick="openCreateQuizModal()">
+          <i class="ri-add-line"></i> Create New Quiz
+        </button>
+      </div>
+    </div>
+
+    <!-- Quiz Cards Grid -->
+    <div class="quiz-grid" id="quizzes-grid">
+      <div class="empty-state" style="grid-column:1/-1;">
+        <div class="empty-icon"><i class="ri-loader-4-line"></i></div>
+        <p>Loading assessment challenges…</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB 3: ANALYTICS (TEACHER / ADMIN ONLY)                              -->
+  <!-- ═════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-view" id="view-analytics">
+    <div class="panel-header" style="background:var(--bg-surface);border:var(--border-thick);border-radius:var(--radius-lg);box-shadow:var(--shadow-retro);margin-bottom:1.75rem;">
+      <div class="panel-title"><i class="ri-bar-chart-box-line"></i> Show Stats & Distribution</div>
+      <button class="btn btn-ghost btn-sm" onclick="loadAnalytics()">
+        <i class="ri-refresh-line"></i> Refresh Stats
+      </button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;" id="analytics-grid-wrap">
+      <!-- Category Distribution -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="ri-folder-chart-line"></i> Questions by Subject</div>
+        </div>
+        <div class="form-panel-body" id="category-chart-body">
+          <p style="color:var(--text-secondary);font-size:0.85rem;">Calculating stats…</p>
+        </div>
+      </div>
+
+      <!-- Difficulty Breakdown -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="ri-pie-chart-line"></i> Difficulty Breakdown</div>
+        </div>
+        <div class="form-panel-body" id="difficulty-chart-body">
+          <p style="color:var(--text-secondary);font-size:0.85rem;">Calculating difficulty…</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </div><!-- /.app-layout -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 70s INTERACTIVE QUIZ ARENA (FULL SCREEN PLAYER)                         -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div id="arena-view">
+  <div class="arena-container">
+    <div class="arena-header">
+      <div class="arena-quiz-title">
+        <i class="ri-sparkling-fill" style="color:var(--orange);"></i>
+        <span id="arena-title">Loading Assessment…</span>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <div class="timer-widget" id="arena-timer">
+          <i class="ri-time-line" style="color:var(--orange);"></i>
+          <span id="arena-time-left">00:00</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="confirmExitQuiz()">Exit Arena</button>
+      </div>
+    </div>
+
+    <!-- Bulb-style Stage Light Progress Bar -->
+    <div class="bulb-bar-wrapper">
+      <span style="font-family:var(--font-mono);font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">
+        STAGE LIGHTS:
+      </span>
+      <div class="bulb-track" id="arena-bulb-track"></div>
+    </div>
+
+    <!-- Stage Lights Question Navigator -->
+    <div class="palette-strip" id="arena-palette"></div>
+
+    <div class="arena-body">
+      <div class="arena-question-meta">
+        <div class="arena-question-number" id="arena-q-step">Question 1 of 20</div>
+        <div id="arena-q-diff"><span class="badge badge-easy">Easy</span></div>
+      </div>
+
+      <div class="arena-question-text" id="arena-q-title">
+        Loading question…
+      </div>
+
+      <div class="options-grid" id="arena-options-grid"></div>
+    </div>
+
+    <div class="arena-footer">
+      <button class="btn btn-secondary" id="arena-prev-btn" onclick="prevQuestion()">
+        <i class="ri-arrow-left-line"></i> Previous
+      </button>
+
+      <div style="font-family:var(--font-mono);color:var(--text-secondary);font-size:0.78rem;">
+        Keys: <kbd style="background:#FCEFD2;border:1.5px solid var(--border-color);padding:2px 6px;border-radius:4px;">1-4</kbd> or <kbd style="background:#FCEFD2;border:1.5px solid var(--border-color);padding:2px 6px;border-radius:4px;">← →</kbd>
+      </div>
+
+      <div style="display:flex;gap:0.6rem;">
+        <button class="btn btn-mustard" id="arena-next-btn" onclick="nextQuestion()">
+          Next Question, Contestant! <i class="ri-arrow-right-line"></i>
+        </button>
+        <button class="btn btn-success" id="arena-submit-btn" onclick="promptSubmitQuiz()">
+          <i class="ri-checkbox-circle-line"></i> Submit Final Answers!
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- 70s TICKET-STUB RESULTS SCREEN                                          -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div id="result-view">
+  <div class="result-container">
+    <div class="result-hero">
+      <div class="retro-stamp">★ OFFICIAL CONTESTANT SCORECARD ★</div>
+      <div class="result-title" id="res-title">Quiz Completed!</div>
+      <div class="result-remark" id="res-remark">Assessment Evaluated</div>
+
+      <div class="result-score-badge">
+        <div class="score-big" id="res-score">0 / 0</div>
+        <div class="score-pct" id="res-percentage">0% Accuracy</div>
+      </div>
+
+      <div class="result-stats-row">
+        <div class="result-stat-box">
+          <div class="result-stat-val" style="color:var(--success);" id="res-correct">0</div>
+          <div class="result-stat-lbl">Ding Ding! Correct</div>
+        </div>
+        <div class="result-stat-box">
+          <div class="result-stat-val" style="color:var(--danger);" id="res-incorrect">0</div>
+          <div class="result-stat-lbl">Bzzzt! Incorrect</div>
+        </div>
+        <div class="result-stat-box">
+          <div class="result-stat-val" id="res-strategy">STANDARD</div>
+          <div class="result-stat-lbl">Scoring Strategy</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:0.75rem;margin-top:1.5rem;flex-wrap:wrap;justify-content:center;">
+        <button class="btn btn-primary" onclick="retakeCurrentQuiz()">
+          <i class="ri-restart-line"></i> Play Again!
+        </button>
+        <button class="btn btn-secondary" onclick="closeResults()">
+          <i class="ri-arrow-go-back-line"></i> Back to the Stage
+        </button>
+      </div>
+    </div>
+
+    <!-- Ticket perforation tear line -->
+    <div class="ticket-perforation"></div>
+
+    <div class="review-panel">
+      <div class="review-header">
+        <i class="ri-file-list-3-line" style="color:var(--orange)"></i>
+        Contestant Answers & Score Breakdown
+      </div>
+      <div class="review-list" id="review-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- CREATE QUIZ MODAL (TEACHER ONLY)                                       -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="create-quiz-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="ri-file-add-line"></i> Create Show Assessment</div>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="closeCreateQuizModal()"><i class="ri-close-line"></i></button>
+    </div>
+
+    <form onsubmit="submitCreateQuiz(event)">
+      <div class="modal-body form-grid">
+        <div class="form-group">
+          <label for="cq-title">Quiz Title *</label>
+          <input id="cq-title" type="text" placeholder="e.g. Python Developer Championship" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cq-category">Category *</label>
+            <select id="cq-category" required>
+              <option value="">Select category…</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="cq-numq">Question Count (Min 10, Rec 20)</label>
+            <input id="cq-numq" type="number" min="5" max="50" value="20" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cq-strategy">Scoring Strategy</label>
+          <select id="cq-strategy">
+            <option value="STANDARD">Standard (+1 Pt Per Correct)</option>
+            <option value="NEGATIVE">Negative Marking (+1 Correct / -0.25 Incorrect)</option>
+            <option value="DIFFICULTY_WEIGHTED">Difficulty-Weighted (Easy=1, Med=2, Hard=3)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeCreateQuizModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="cq-submit-btn">
+          <i class="ri-check-line"></i> Launch Assessment
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- AUTH MODAL (SIGN IN & REGISTRATION)                                    -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="auth-modal-title">Contestant Sign In</div>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="closeAuthModal()"><i class="ri-close-line"></i></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="btn-tab-signin" onclick="switchAuthTab('signin')">Sign In</button>
+        <button class="auth-tab-btn" id="btn-tab-register" onclick="switchAuthTab('register')">New Contestant</button>
+      </div>
+
+      <!-- Sign In Form -->
+      <form id="form-signin" onsubmit="handleSignIn(event)" class="form-grid">
+        <div class="form-group">
+          <label for="auth-username">Username</label>
+          <input id="auth-username" type="text" placeholder="Enter username" required />
+        </div>
+
+        <div class="form-group">
+          <label for="auth-password">Password</label>
+          <input id="auth-password" type="password" placeholder="••••••••" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" id="btn-do-login" style="width:100%;margin-top:0.5rem;">
+          <i class="ri-login-box-line"></i> Step Up & Sign In
+        </button>
+
+        <!-- Fast 1-Click Demo Buttons -->
+        <div style="margin-top:1rem;padding-top:1rem;border-top:2px dashed rgba(43, 29, 20, 0.2);">
+          <div style="font-family:var(--font-mono);font-size:0.75rem;font-weight:700;color:var(--text-secondary);margin-bottom:0.6rem;text-align:center;">
+            Quick 1-Click Demo Logins:
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+            <button type="button" class="btn btn-mustard btn-sm" onclick="quickDemoLogin('admin')">
+              <i class="ri-shield-user-line"></i> Demo Host
+            </button>
+            <button type="button" class="btn btn-teal btn-sm" onclick="quickDemoLogin('student')">
+              <i class="ri-user-smile-line"></i> Demo Contestant
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Register Form -->
+      <form id="form-register" onsubmit="handleRegister(event)" class="form-grid" style="display:none;">
+        <div class="form-group">
+          <label for="reg-fullname">Contestant Full Name</label>
+          <input id="reg-fullname" type="text" placeholder="e.g. Alex Contestant" />
+        </div>
+
+        <div class="form-group">
+          <label for="reg-username">Username *</label>
+          <input id="reg-username" type="text" placeholder="Choose a username" required minlength="3" />
+        </div>
+
+        <div class="form-group">
+          <label for="reg-email">Email Address (Optional)</label>
+          <input id="reg-email" type="email" placeholder="user@example.com" />
+        </div>
+
+        <div class="form-group">
+          <label for="reg-password">Password * (min 4 characters)</label>
+          <input id="reg-password" type="password" placeholder="••••••••" required minlength="4" />
+        </div>
+
+        <div class="form-group">
+          <label>Account Role</label>
+          <div class="role-select-grid">
+            <label class="role-option selected" id="role-opt-student" onclick="selectRegRole('ROLE_STUDENT')">
+              <input type="radio" name="regRole" value="ROLE_STUDENT" checked />
+              <strong>Candidate / Student</strong>
+              <span>Take quizzes, review scores</span>
+            </label>
+            <label class="role-option" id="role-opt-admin" onclick="selectRegRole('ROLE_ADMIN')">
+              <input type="radio" name="regRole" value="ROLE_ADMIN" />
+              <strong>Host / Teacher</strong>
+              <span>Manage questions & quizzes</span>
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" id="btn-do-register" style="width:100%;margin-top:0.5rem;">
+          <i class="ri-user-add-line"></i> Register Contestant
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
 
 <!-- ── Delete Confirm Modal ──────────────────────────────────────────────── -->
 <div class="modal-overlay" id="delete-modal">
   <div class="modal">
-    <div class="modal-title">🗑️ Delete Question</div>
-    <div class="modal-desc">Are you sure you want to delete this question? This action cannot be undone.</div>
+    <div class="modal-header">
+      <div class="modal-title" id="del-modal-title">Confirm Deletion</div>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="closeDeleteModal()"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="modal-body" id="del-modal-desc">
+      Are you sure? This action cannot be undone.
+    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeDeleteModal()">Cancel</button>
       <button class="btn btn-danger" id="confirm-delete-btn">Delete</button>
@@ -725,27 +1884,373 @@
   </div>
 </div>
 
-<!-- ── Toast Container ────────────────────────────────────────────────────── -->
+<!-- Toast Container -->
 <div id="toast-container"></div>
 
 <script>
-  // ── Config ─────────────────────────────────────────────────────────────────
-  const API = '/question';
+  // ── Authentication & Token State ───────────────────────────────────────────
+  const TOKEN_KEY = 'quiz_auth_token';
+  const USER_KEY  = 'quiz_user_profile';
+
+  let currentAuth = getStoredAuth();
+  let selectedRegisterRole = 'ROLE_STUDENT';
+
+  function getStoredAuth() {
+    try {
+      const token = localStorage.getItem(TOKEN_KEY);
+      const userRaw = localStorage.getItem(USER_KEY);
+      if (token && userRaw) {
+        return { token, user: JSON.parse(userRaw) };
+      }
+    } catch {}
+    return null;
+  }
+
+  function saveAuth(response) {
+    if (!response || !response.token) return;
+    localStorage.setItem(TOKEN_KEY, response.token);
+    const userObj = {
+      username: response.username,
+      fullName: response.fullName || response.username,
+      role: response.role
+    };
+    localStorage.setItem(USER_KEY, JSON.stringify(userObj));
+    currentAuth = { token: response.token, user: userObj };
+    renderAuthUI();
+  }
+
+  function clearAuthSession() {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    currentAuth = null;
+    renderAuthUI();
+  }
+
+  function isTeacher() {
+    return currentAuth?.user?.role === 'ROLE_ADMIN';
+  }
+
+  function isStudent() {
+    return currentAuth?.user?.role === 'ROLE_STUDENT';
+  }
+
+  // ── Authenticated Fetch Wrapper ────────────────────────────────────────────
+  async function authFetch(url, options = {}) {
+    const headers = { ...(options.headers || {}) };
+    if (currentAuth?.token) {
+      headers['Authorization'] = `Bearer ${currentAuth.token}`;
+    }
+    const response = await fetch(url, { ...options, headers });
+    if (response.status === 401) {
+      clearAuthSession();
+      openAuthModal('signin', 'Session expired. Please sign in again.');
+      throw new Error('Unauthorized');
+    }
+    return response;
+  }
+
+  // ── State & API Config ─────────────────────────────────────────────────────
+  const API_Q = '/question';
+  const API_Z = '/quiz';
+  const API_AUTH = '/auth';
+
+  let allQuestions = [];
+  let allQuizzes = [];
+  let availableCategories = [];
   let currentPage = 0;
   const PAGE_SIZE = 8;
-  let allQuestions = [];
-  let pendingDeleteId = null;
 
-  // ── Toast ───────────────────────────────────────────────────────────────────
+  // Active Quiz Playing State
+  let activeQuizId = null;
+  let activeQuizTitle = '';
+  let activeScoringType = 'STANDARD';
+  let activeQuizQuestions = [];
+  let currentQuestionIndex = 0;
+  let userAnswers = {}; // { questionId: selectedOptionText }
+  let quizTimerInterval = null;
+  let secondsRemaining = 0;
+
+  // Audio Context (Synthesized 70s Game Show Sound Effects)
+  let audioCtx = null;
+  function playBeep(freq = 600, duration = 0.08, type = 'sine') {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    } catch {}
+  }
+
+  function playDingDing() {
+    playBeep(659, 0.12, 'sine');
+    setTimeout(() => playBeep(880, 0.25, 'sine'), 130);
+  }
+
+  function playBuzzer() {
+    playBeep(160, 0.35, 'sawtooth');
+  }
+
+  // ── Toast Notification ─────────────────────────────────────────────────────
   function toast(msg, type = 'info') {
     const el = document.createElement('div');
     el.className = `toast ${type}`;
-    el.textContent = msg;
+    const icon = type === 'success' ? 'ri-checkbox-circle-fill' : type === 'error' ? 'ri-error-warning-fill' : 'ri-notification-fill';
+    el.innerHTML = `<i class="${icon}"></i> <span>${escHtml(msg)}</span>`;
     document.getElementById('toast-container').appendChild(el);
-    setTimeout(() => el.remove(), 3100);
+    setTimeout(() => el.remove(), 3500);
   }
 
-  // ── Health Check ────────────────────────────────────────────────────────────
+  function escHtml(str) {
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── Tab Navigation ─────────────────────────────────────────────────────────
+  function switchTab(tabId) {
+    if (!isTeacher() && tabId === 'analytics') {
+      toast('Show Stats are restricted to Show Host role', 'info');
+      tabId = 'quizzes';
+    }
+
+    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+
+    const btn = document.getElementById(`tab-btn-${tabId}`);
+    const view = document.getElementById(`view-${tabId}`);
+    if (btn) btn.classList.add('active');
+    if (view) view.classList.add('active');
+
+    if (tabId === 'questions') loadQuestions();
+    if (tabId === 'quizzes') loadQuizzes();
+    if (tabId === 'analytics') loadAnalytics();
+  }
+
+  function onBrandClick(e) {
+    e.preventDefault();
+    switchTab('quizzes');
+  }
+
+  // ── Auth UI Rendering ──────────────────────────────────────────────────────
+  function renderAuthUI() {
+    const container = document.getElementById('auth-actions');
+    const tabQuestions = document.getElementById('tab-btn-questions');
+    const tabAnalytics = document.getElementById('tab-btn-analytics');
+    const teacherActions = document.getElementById('teacher-quiz-actions');
+    const subtitle = document.getElementById('quiz-hub-subtitle');
+    const formPanel = document.getElementById('question-form-panel');
+    const studyPanel = document.getElementById('candidate-study-panel');
+
+    if (currentAuth?.user) {
+      const user = currentAuth.user;
+      const isAdminRole = user.role === 'ROLE_ADMIN';
+      const roleLabel = isAdminRole ? 'Host' : 'Contestant';
+      const roleClass = isAdminRole ? 'role-admin' : 'role-student';
+      const roleIcon = isAdminRole ? 'ri-shield-user-line' : 'ri-user-smile-line';
+
+      container.innerHTML = `
+        <div class="user-chip">
+          <span class="role-badge ${roleClass}">
+            <i class="${roleIcon}"></i> ${roleLabel}
+          </span>
+          <span class="user-name">${escHtml(user.fullName || user.username)}</span>
+          <button class="btn btn-ghost btn-sm" onclick="switchRoleToggle()" title="Switch to ${isAdminRole ? 'Contestant' : 'Host'} mode" style="padding:0.25rem 0.6rem;font-size:0.75rem;">
+            ⇄ Switch
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="clearAuthSession();toast('Signed out! Thanks for playing!','info')" title="Sign Out" style="padding:0.25rem 0.6rem;font-size:0.75rem;">
+            <i class="ri-logout-box-r-line"></i>
+          </button>
+        </div>
+      `;
+
+      tabQuestions.style.display = 'inline-flex';
+      if (isAdminRole) {
+        tabAnalytics.style.display = 'inline-flex';
+        if (teacherActions) teacherActions.style.display = 'flex';
+        if (subtitle) subtitle.textContent = 'Welcome Host! Manage interview questions or create 20-question grand assessments.';
+        if (formPanel) formPanel.style.display = 'block';
+        if (studyPanel) studyPanel.style.display = 'none';
+      } else {
+        tabAnalytics.style.display = 'none';
+        if (teacherActions) teacherActions.style.display = 'none';
+        if (subtitle) subtitle.textContent = 'Welcome Contestant! Pick a 20-question challenge to prepare for your developer interview!';
+        if (formPanel) formPanel.style.display = 'none';
+        if (studyPanel) studyPanel.style.display = 'block';
+      }
+    } else {
+      // Unauthenticated
+      container.innerHTML = `
+        <button class="btn btn-primary btn-sm" onclick="openAuthModal('signin')">
+          <i class="ri-user-line"></i> Sign In / Register
+        </button>
+      `;
+      tabQuestions.style.display = 'inline-flex';
+      tabAnalytics.style.display = 'none';
+      if (teacherActions) teacherActions.style.display = 'none';
+      if (formPanel) formPanel.style.display = 'none';
+      if (studyPanel) studyPanel.style.display = 'block';
+    }
+  }
+
+  // ── Auth Modal Logic ───────────────────────────────────────────────────────
+  function openAuthModal(tab = 'signin', alertMsg = null) {
+    switchAuthTab(tab);
+    document.getElementById('auth-modal').classList.add('open');
+    if (alertMsg) toast(alertMsg, 'info');
+  }
+
+  function closeAuthModal() {
+    document.getElementById('auth-modal').classList.remove('open');
+  }
+
+  function switchAuthTab(tab) {
+    const btnSignin = document.getElementById('btn-tab-signin');
+    const btnReg = document.getElementById('btn-tab-register');
+    const formSignin = document.getElementById('form-signin');
+    const formReg = document.getElementById('form-register');
+    const title = document.getElementById('auth-modal-title');
+
+    if (tab === 'signin') {
+      btnSignin.classList.add('active');
+      btnReg.classList.remove('active');
+      formSignin.style.display = 'grid';
+      formReg.style.display = 'none';
+      title.textContent = 'Contestant Sign In';
+    } else {
+      btnSignin.classList.remove('active');
+      btnReg.classList.add('active');
+      formSignin.style.display = 'none';
+      formReg.style.display = 'grid';
+      title.textContent = 'Join the Show';
+    }
+  }
+
+  function selectRegRole(role) {
+    selectedRegisterRole = role;
+    document.getElementById('role-opt-student').classList.toggle('selected', role === 'ROLE_STUDENT');
+    document.getElementById('role-opt-admin').classList.toggle('selected', role === 'ROLE_ADMIN');
+  }
+
+  async function handleSignIn(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-do-login');
+    btn.disabled = true;
+    btn.innerHTML = `<i class="ri-loader-4-line"></i> Connecting…`;
+
+    const username = document.getElementById('auth-username').value.trim();
+    const password = document.getElementById('auth-password').value.trim();
+
+    try {
+      const res = await fetch(`${API_AUTH}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Invalid username or password');
+      }
+
+      const data = await res.json();
+      saveAuth(data);
+      closeAuthModal();
+      toast(`Welcome to the stage, ${data.fullName || data.username}!`, 'success');
+      switchTab(data.role === 'ROLE_ADMIN' ? 'questions' : 'quizzes');
+    } catch (err) {
+      toast(err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="ri-login-box-line"></i> Step Up & Sign In`;
+    }
+  }
+
+  async function handleRegister(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-do-register');
+    btn.disabled = true;
+    btn.innerHTML = `<i class="ri-loader-4-line"></i> Registering…`;
+
+    const username = document.getElementById('reg-username').value.trim();
+    const password = document.getElementById('reg-password').value.trim();
+    const fullName = document.getElementById('reg-fullname').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const role = selectedRegisterRole;
+
+    try {
+      const payload = {
+        username,
+        password,
+        fullName: fullName || username,
+        email: email || null,
+        role: role.replace('ROLE_', '')
+      };
+
+      const res = await fetch(`${API_AUTH}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        let msg = 'Registration failed';
+        if (err.message) msg = err.message;
+        else if (err.fieldErrors) msg = Object.values(err.fieldErrors).join(', ');
+        throw new Error(msg);
+      }
+
+      const data = await res.json();
+      saveAuth(data);
+      closeAuthModal();
+      toast(`Welcome contestant ${data.username}!`, 'success');
+      switchTab(data.role === 'ROLE_ADMIN' ? 'questions' : 'quizzes');
+    } catch (err) {
+      toast(err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="ri-user-add-line"></i> Register Contestant`;
+    }
+  }
+
+  async function quickDemoLogin(role) {
+    const creds = role === 'admin'
+      ? { username: 'admin', password: 'admin123' }
+      : { username: 'student', password: 'student123' };
+
+    try {
+      const res = await fetch(`${API_AUTH}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(creds)
+      });
+
+      if (!res.ok) throw new Error('Demo login failed');
+      const data = await res.json();
+      saveAuth(data);
+      closeAuthModal();
+      toast(`Signed in as ${data.fullName}`, 'success');
+      const activeTab = document.querySelector('.nav-tab.active')?.id?.replace('tab-btn-', '') || 'quizzes';
+      switchTab(activeTab === 'analytics' && data.role !== 'ROLE_ADMIN' ? 'quizzes' : activeTab);
+    } catch {
+      toast('Demo authentication failed. Make sure Spring Boot is running.', 'error');
+    }
+  }
+
+  function switchRoleToggle() {
+    if (isTeacher()) {
+      quickDemoLogin('student');
+    } else {
+      quickDemoLogin('admin');
+    }
+  }
+
+  // ── Health Check ───────────────────────────────────────────────────────────
   async function checkHealth() {
     try {
       const r = await fetch('/actuator/health');
@@ -754,34 +2259,36 @@
       const txt = document.getElementById('health-text');
       if (data.status === 'UP') {
         dot.className = 'health-dot up';
-        txt.textContent = 'API is UP';
+        txt.textContent = 'ON AIR';
       } else {
         dot.className = 'health-dot down';
-        txt.textContent = 'API is DOWN';
+        txt.textContent = 'OFF AIR';
       }
     } catch {
-      document.getElementById('health-dot').className = 'health-dot down';
-      document.getElementById('health-text').textContent = 'Cannot reach API';
+      const dot = document.getElementById('health-dot');
+      const txt = document.getElementById('health-text');
+      dot.className = 'health-dot down';
+      txt.textContent = 'OFF AIR';
     }
   }
 
-  // ── Load Questions ──────────────────────────────────────────────────────────
+  // ── Questions Repository ───────────────────────────────────────────────────
   async function loadQuestions() {
     const tbody = document.getElementById('questions-tbody');
-    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⏳</div><p>Loading…</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon"><i class="ri-loader-4-line"></i></div><p>Tuning in questions…</p></div></td></tr>`;
     try {
-      const r = await fetch(`${API}/allQuestion?page=0&size=1000`);
+      const r = await authFetch(`${API_Q}/allQuestion?page=0&size=1000`);
       const data = await r.json();
       allQuestions = data.content || [];
+      document.getElementById('nav-q-count').textContent = allQuestions.length;
       updateStats(allQuestions);
       applyFilters();
-    } catch (err) {
-      toast('Failed to load questions. Is the server running?', 'error');
-      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⚠️</div><p>Could not connect to Spring Boot API</p></div></td></tr>`;
+      loadCategories();
+    } catch {
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon"><i class="ri-error-warning-line"></i></div><p>Please sign in to view question repository.</p></div></td></tr>`;
     }
   }
 
-  // ── Stats ───────────────────────────────────────────────────────────────────
   function updateStats(questions) {
     document.getElementById('stat-total').textContent  = questions.length;
     document.getElementById('stat-easy').textContent   = questions.filter(q => q.difficultyLevel?.toLowerCase() === 'easy').length;
@@ -789,16 +2296,16 @@
     document.getElementById('stat-hard').textContent   = questions.filter(q => q.difficultyLevel?.toLowerCase() === 'hard').length;
   }
 
-  // ── Filters + Render ─────────────────────────────────────────────────────────
   function applyFilters() {
-    currentPage = 0;
-    const catFilter  = document.getElementById('filter-category').value.toLowerCase();
-    const diffFilter = document.getElementById('filter-difficulty').value.toLowerCase();
+    const searchVal = (document.getElementById('filter-search')?.value || '').toLowerCase().trim();
+    const catVal = (document.getElementById('filter-category')?.value || '').toLowerCase().trim();
+    const diffVal = (document.getElementById('filter-difficulty')?.value || '').toLowerCase().trim();
 
     let filtered = allQuestions.filter(q => {
-      const catMatch  = !catFilter  || q.category?.toLowerCase().includes(catFilter);
-      const diffMatch = !diffFilter || q.difficultyLevel?.toLowerCase() === diffFilter;
-      return catMatch && diffMatch;
+      const matchSearch = !searchVal || (q.questionTitle || '').toLowerCase().includes(searchVal);
+      const matchCat = !catVal || (q.category || '').toLowerCase().includes(catVal);
+      const matchDiff = !diffVal || (q.difficultyLevel || '').toLowerCase() === diffVal;
+      return matchSearch && matchCat && matchDiff;
     });
 
     renderTable(filtered);
@@ -811,22 +2318,30 @@
     const tbody = document.getElementById('questions-tbody');
 
     if (slice.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🔍</div><p>No questions found</p></div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon"><i class="ri-search-line"></i></div><p>No questions match your search.</p></div></td></tr>`;
       return;
     }
 
     tbody.innerHTML = slice.map(q => `
       <tr>
-        <td><span style="color:var(--text-muted);font-size:0.75rem">#${q.id}</span></td>
+        <td><span style="font-family:var(--font-mono);font-weight:700;color:var(--text-secondary)">#${q.id}</span></td>
         <td class="td-title" title="${escHtml(q.questionTitle)}">${escHtml(q.questionTitle)}</td>
         <td><span class="cat-pill">${escHtml(q.category)}</span></td>
         <td>${diffBadge(q.difficultyLevel)}</td>
-        <td style="color:var(--green);font-weight:500">${escHtml(q.rightAnswer)}</td>
+        <td style="color:var(--success);font-weight:700">${escHtml(q.rightAnswer)}</td>
         <td>
-          <div style="display:flex;gap:0.4rem;">
-            <button class="btn btn-ghost btn-icon btn-sm" title="Edit" onclick="editQuestion(${q.id})">✏️</button>
-            <button class="btn btn-danger btn-icon btn-sm" title="Delete" onclick="confirmDelete(${q.id})">🗑️</button>
+          ${isTeacher() ? `
+          <div style="display:flex;gap:0.35rem;">
+            <button class="btn btn-ghost btn-icon btn-sm" title="Edit" onclick="editQuestion(${q.id})">
+              <i class="ri-edit-line"></i>
+            </button>
+            <button class="btn btn-danger btn-icon btn-sm" title="Delete" onclick="confirmDeleteQuestion(${q.id})">
+              <i class="ri-delete-bin-line"></i>
+            </button>
           </div>
+          ` : `
+          <span class="badge badge-default" style="font-size:0.75rem;"><i class="ri-book-open-line"></i> Study</span>
+          `}
         </td>
       </tr>
     `).join('');
@@ -835,8 +2350,14 @@
   function renderPagination(data) {
     const totalPages = Math.ceil(data.length / PAGE_SIZE);
     const pg = document.getElementById('pagination');
+    const info = document.getElementById('pagination-info');
+    if (totalPages <= 1) {
+      pg.innerHTML = '';
+      if (info) info.textContent = `Showing all ${data.length} questions`;
+      return;
+    }
 
-    if (totalPages <= 1) { pg.innerHTML = ''; return; }
+    if (info) info.textContent = `Showing page ${currentPage + 1} of ${totalPages} (${data.length} total)`;
 
     let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===0?'disabled':''}>‹</button>`;
     for (let i = 0; i < totalPages; i++) {
@@ -846,22 +2367,9 @@
     pg.innerHTML = html;
   }
 
-  function goPage(page) {
-    currentPage = page;
-    const catFilter  = document.getElementById('filter-category').value.toLowerCase();
-    const diffFilter = document.getElementById('filter-difficulty').value.toLowerCase();
-    let filtered = allQuestions.filter(q => {
-      const catMatch  = !catFilter  || q.category?.toLowerCase().includes(catFilter);
-      const diffMatch = !diffFilter || q.difficultyLevel?.toLowerCase() === diffFilter;
-      return catMatch && diffMatch;
-    });
-    renderTable(filtered);
-    renderPagination(filtered);
-  }
-
-  // ── Helpers ──────────────────────────────────────────────────────────────────
-  function escHtml(str) {
-    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  function goPage(p) {
+    currentPage = p;
+    applyFilters();
   }
 
   function diffBadge(level) {
@@ -870,135 +2378,637 @@
     return `<span class="badge ${cls}">${escHtml(level || '–')}</span>`;
   }
 
-  // ── Form ─────────────────────────────────────────────────────────────────────
-  function openAddModal() {
-    resetForm();
-    document.getElementById('form-panel-title').textContent = '➕ Add Question';
-    document.getElementById('form-submit-btn').textContent = '✅ Save Question';
-    document.getElementById('f-title').focus();
-  }
-
   function resetForm() {
     document.getElementById('question-form').reset();
     document.getElementById('edit-id').value = '';
-    document.getElementById('form-panel-title').textContent = '➕ Add Question';
-    document.getElementById('form-submit-btn').textContent = '✅ Save Question';
+    document.getElementById('form-panel-title').innerHTML = `<i class="ri-add-circle-line"></i> Add Question`;
+    document.getElementById('form-submit-btn').innerHTML = `<i class="ri-save-line"></i> Save Question`;
   }
 
   async function editQuestion(id) {
     try {
-      const r = await fetch(`${API}/${id}`);
-      if (!r.ok) throw new Error('Not found');
+      const r = await authFetch(`${API_Q}/${id}`);
+      if (!r.ok) throw new Error();
       const q = await r.json();
       document.getElementById('edit-id').value      = q.id;
-      document.getElementById('f-title').value      = q.questionTitle   || '';
-      document.getElementById('f-opt1').value       = q.option1         || '';
-      document.getElementById('f-opt2').value       = q.option2         || '';
-      document.getElementById('f-opt3').value       = q.option3         || '';
-      document.getElementById('f-opt4').value       = q.option4         || '';
-      document.getElementById('f-answer').value     = q.rightAnswer     || '';
-      document.getElementById('f-category').value   = q.category        || '';
-      document.getElementById('f-difficulty').value = q.difficultyLevel || '';
-      document.getElementById('form-panel-title').textContent = `✏️ Edit #${q.id}`;
-      document.getElementById('form-submit-btn').textContent  = '💾 Update Question';
+      document.getElementById('f-title').value      = q.questionTitle || '';
+      document.getElementById('f-opt1').value       = q.option1 || '';
+      document.getElementById('f-opt2').value       = q.option2 || '';
+      document.getElementById('f-opt3').value       = q.option3 || '';
+      document.getElementById('f-opt4').value       = q.option4 || '';
+      document.getElementById('f-answer').value     = q.rightAnswer || '';
+      document.getElementById('f-category').value   = q.category || '';
+      document.getElementById('f-difficulty').value = q.difficultyLevel || 'Easy';
+      document.getElementById('form-panel-title').innerHTML = `<i class="ri-edit-line"></i> Edit #${q.id}`;
+      document.getElementById('form-submit-btn').innerHTML  = `<i class="ri-save-line"></i> Update Question`;
       document.getElementById('f-title').scrollIntoView({ behavior: 'smooth', block: 'center' });
     } catch {
-      toast('Failed to load question for editing', 'error');
+      toast('Failed to load question details', 'error');
     }
   }
 
-  async function submitForm(e) {
+  async function submitQuestionForm(e) {
     e.preventDefault();
     const editId = document.getElementById('edit-id').value;
     const payload = {
-      questionTitle:  document.getElementById('f-title').value.trim(),
-      option1:        document.getElementById('f-opt1').value.trim(),
-      option2:        document.getElementById('f-opt2').value.trim(),
-      option3:        document.getElementById('f-opt3').value.trim(),
-      option4:        document.getElementById('f-opt4').value.trim(),
-      rightAnswer:    document.getElementById('f-answer').value.trim(),
-      category:       document.getElementById('f-category').value.trim(),
-      difficultyLevel:document.getElementById('f-difficulty').value,
+      questionTitle:   document.getElementById('f-title').value.trim(),
+      option1:         document.getElementById('f-opt1').value.trim(),
+      option2:         document.getElementById('f-opt2').value.trim(),
+      option3:         document.getElementById('f-opt3').value.trim(),
+      option4:         document.getElementById('f-opt4').value.trim(),
+      rightAnswer:     document.getElementById('f-answer').value.trim(),
+      category:        document.getElementById('f-category').value.trim(),
+      difficultyLevel: document.getElementById('f-difficulty').value
     };
 
-    const btn = document.getElementById('form-submit-btn');
-    btn.disabled = true;
-    btn.textContent = '⏳ Saving…';
+    const isEdit = !!editId;
+    const url = isEdit ? `${API_Q}/update/${editId}` : `${API_Q}/add`;
+    const method = isEdit ? 'PUT' : 'POST';
 
     try {
-      let r;
-      if (editId) {
-        r = await fetch(`${API}/update/${editId}`, {
-          method: 'PUT',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify(payload)
-        });
-      } else {
-        r = await fetch(`${API}/add`, {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify(payload)
-        });
-      }
-
+      const r = await authFetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
       if (r.ok) {
-        toast(editId ? 'Question updated! ✅' : 'Question added! ✅', 'success');
+        toast(`Question ${isEdit ? 'updated' : 'added'} successfully!`, 'success');
         resetForm();
-        await loadQuestions();
+        loadQuestions();
       } else {
-        const err = await r.json();
-        if (err.fieldErrors) {
-          const msgs = Object.entries(err.fieldErrors).map(([k,v]) => `${k}: ${v}`).join('\n');
-          toast('Validation error:\n' + msgs, 'error');
-        } else {
-          toast(err.message || 'Save failed', 'error');
-        }
+        const err = await r.json().catch(() => ({}));
+        toast(err.message || 'Operation failed', 'error');
       }
     } catch {
-      toast('Network error – is the server running?', 'error');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = editId ? '💾 Update Question' : '✅ Save Question';
+      toast('Network error saving question', 'error');
     }
   }
 
-  // ── Delete ────────────────────────────────────────────────────────────────────
-  function confirmDelete(id) {
-    pendingDeleteId = id;
+  let deleteTarget = null;
+  function confirmDeleteQuestion(id) {
+    deleteTarget = { type: 'question', id };
+    document.getElementById('del-modal-title').textContent = 'Delete Question';
+    document.getElementById('del-modal-desc').textContent = `Are you sure you want to delete Question #${id}? This cannot be undone.`;
     document.getElementById('delete-modal').classList.add('open');
-    document.getElementById('confirm-delete-btn').onclick = () => doDelete(id);
+  }
+
+  function confirmDeleteQuiz(id, title) {
+    deleteTarget = { type: 'quiz', id, title };
+    document.getElementById('del-modal-title').textContent = 'Delete Quiz';
+    document.getElementById('del-modal-desc').textContent = `Are you sure you want to delete "${title || 'Quiz #' + id}"?`;
+    document.getElementById('delete-modal').classList.add('open');
   }
 
   function closeDeleteModal() {
     document.getElementById('delete-modal').classList.remove('open');
-    pendingDeleteId = null;
+    deleteTarget = null;
   }
 
-  async function doDelete(id) {
+  document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+    if (!deleteTarget) return;
+    const { type, id } = deleteTarget;
     closeDeleteModal();
-    try {
-      const r = await fetch(`${API}/delete/${id}`, { method: 'DELETE' });
-      if (r.ok) {
-        toast('Question deleted 🗑️', 'success');
-        await loadQuestions();
-      } else {
-        const err = await r.json();
-        toast(err.message || 'Delete failed', 'error');
+
+    if (type === 'question') {
+      try {
+        const r = await authFetch(`${API_Q}/delete/${id}`, { method: 'DELETE' });
+        if (r.ok) {
+          toast('Question deleted successfully', 'success');
+          loadQuestions();
+        } else {
+          toast('Failed to delete question', 'error');
+        }
+      } catch {
+        toast('Network error deleting question', 'error');
       }
+    } else if (type === 'quiz') {
+      try {
+        const r = await authFetch(`${API_Z}/delete/${id}`, { method: 'DELETE' });
+        if (r.ok) {
+          toast('Quiz deleted successfully', 'success');
+          loadQuizzes();
+        } else {
+          toast('Failed to delete quiz', 'error');
+        }
+      } catch {
+        toast('Network error deleting quiz', 'error');
+      }
+    }
+  });
+
+  // ── Quizzes Hub (Students & Teachers) ──────────────────────────────────────
+  async function loadQuizzes() {
+    const grid = document.getElementById('quizzes-grid');
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon"><i class="ri-loader-4-line"></i></div><p>Rolling the show reel… loading quizzes…</p></div>`;
+
+    try {
+      const r = await authFetch(`${API_Z}/all`);
+      if (!r.ok) throw new Error();
+      allQuizzes = await r.json();
+      document.getElementById('nav-quiz-count').textContent = allQuizzes.length;
+
+      if (allQuizzes.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1;">
+            <div class="empty-icon"><i class="ri-trophy-line"></i></div>
+            <p style="font-family:var(--font-display);font-size:1.4rem;color:var(--text-primary);">No Assessments Scheduled Yet!</p>
+            <p style="margin:0.5rem 0 1.25rem;">${isTeacher() ? 'Host, create an assessment challenge for contestants!' : 'Check back shortly for the next live challenge.'}</p>
+            ${isTeacher() ? '<button class="btn btn-primary" onclick="openCreateQuizModal()"><i class="ri-add-line"></i> Create First Quiz</button>' : ''}
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = allQuizzes.map(quiz => {
+        const qCount = quiz.questions ? quiz.questions.length : 0;
+        const categories = [...new Set((quiz.questions || []).map(q => q.category).filter(Boolean))];
+        const catBadge = categories.length > 0 ? categories.slice(0, 2).join(' / ') : 'Grand Challenge';
+
+        return `
+          <div class="quiz-card">
+            <div class="quiz-card-top">
+              <span class="quiz-badge-id">CHALLENGE #${quiz.id}</span>
+              <span class="cat-pill">${escHtml(catBadge)}</span>
+            </div>
+
+            <div>
+              <div class="quiz-card-title">${escHtml(quiz.title || 'Grand Assessment')}</div>
+              <div class="quiz-card-meta">
+                <span class="badge badge-default"><i class="ri-file-text-line"></i> ${qCount} Questions</span>
+                <span class="badge badge-easy"><i class="ri-flashlight-line"></i> 20 Mins</span>
+              </div>
+            </div>
+
+            <div class="quiz-card-actions">
+              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="launchQuiz(${quiz.id}, '${escHtml(quiz.title || 'Quiz #' + quiz.id)}', 'STANDARD')">
+                <i class="ri-play-fill"></i> Step Up & Play (${qCount} Qs)
+              </button>
+              ${isTeacher() ? `
+                <button class="btn btn-ghost btn-icon btn-sm" title="Delete Quiz" onclick="confirmDeleteQuiz(${quiz.id}, '${escHtml(quiz.title)}')">
+                  <i class="ri-delete-bin-line"></i>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
     } catch {
-      toast('Network error', 'error');
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon"><i class="ri-error-warning-line"></i></div><p>Please sign in to view assessments.</p></div>`;
     }
   }
 
-  // ── Close modal on overlay click ──────────────────────────────────────────────
-  document.getElementById('delete-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeDeleteModal();
+  async function loadCategories() {
+    try {
+      const r = await authFetch(`${API_Q}/categories`);
+      if (r.ok) {
+        availableCategories = await r.json();
+        const sel = document.getElementById('cq-category');
+        if (sel) {
+          sel.innerHTML = '<option value="">Select category…</option>' +
+            availableCategories.map(c => `<option value="${escHtml(c)}">${escHtml(c)}</option>`).join('');
+        }
+      }
+    } catch {}
+  }
+
+  function openCreateQuizModal() {
+    if (!isTeacher()) return;
+    loadCategories();
+    document.getElementById('create-quiz-modal').classList.add('open');
+  }
+
+  function closeCreateQuizModal() {
+    document.getElementById('create-quiz-modal').classList.remove('open');
+  }
+
+  async function submitCreateQuiz(e) {
+    e.preventDefault();
+    const title = document.getElementById('cq-title').value.trim();
+    const category = document.getElementById('cq-category').value;
+    const numQ = document.getElementById('cq-numq').value || 20;
+    const strategy = document.getElementById('cq-strategy').value || 'STANDARD';
+
+    const btn = document.getElementById('cq-submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = `<i class="ri-loader-4-line"></i> Spinning Wheel…`;
+
+    try {
+      const params = new URLSearchParams({ category, numQ });
+      if (title) params.append('title', title);
+
+      const r = await authFetch(`${API_Z}/create?${params.toString()}`, { method: 'POST' });
+      if (r.ok) {
+        const text = await r.text();
+        closeCreateQuizModal();
+        toast('Quiz launched successfully, Host!', 'success');
+
+        const match = text.match(/\d+/);
+        const quizId = match ? parseInt(match[0]) : null;
+
+        await loadQuizzes();
+        if (quizId) {
+          launchQuiz(quizId, title || `${category} Quiz`, strategy);
+        }
+      } else {
+        const err = await r.json().catch(() => ({}));
+        toast(err.message || 'Could not create quiz. Verify questions exist for category.', 'error');
+      }
+    } catch {
+      toast('Error creating quiz', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="ri-check-line"></i> Launch Assessment`;
+    }
+  }
+
+  async function startQuickRandomQuiz() {
+    if (availableCategories.length === 0) await loadCategories();
+    const cat = availableCategories.length > 0
+      ? availableCategories[Math.floor(Math.random() * availableCategories.length)]
+      : 'Python';
+
+    toast(`Spinning the wheel for a 20-Question ${cat} Challenge!`, 'info');
+    try {
+      const title = `Live ${cat} 20-Question Invitational`;
+      const r = await authFetch(`${API_Z}/create?category=${encodeURIComponent(cat)}&numQ=20&title=${encodeURIComponent(title)}`, { method: 'POST' });
+      if (r.ok) {
+        const text = await r.text();
+        const match = text.match(/\d+/);
+        const quizId = match ? parseInt(match[0]) : null;
+        if (quizId) {
+          launchQuiz(quizId, title, 'STANDARD');
+        }
+      } else {
+        toast('Not enough questions available to generate challenge', 'error');
+      }
+    } catch {
+      toast('Error launching random challenge', 'error');
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 70s INTERACTIVE QUIZ ARENA ENGINE (PLAYER)
+  // ═══════════════════════════════════════════════════════════════════════════
+  async function launchQuiz(quizId, title, scoringType = 'STANDARD') {
+    activeQuizId = quizId;
+    activeQuizTitle = title;
+    activeScoringType = scoringType;
+    userAnswers = {};
+    currentQuestionIndex = 0;
+
+    try {
+      const r = await authFetch(`${API_Z}/get/${quizId}`);
+      if (!r.ok) throw new Error();
+      activeQuizQuestions = await r.json();
+
+      if (activeQuizQuestions.length === 0) {
+        toast('This quiz has no questions available.', 'error');
+        return;
+      }
+
+      document.getElementById('arena-title').textContent = activeQuizTitle;
+      document.getElementById('arena-view').classList.add('open');
+
+      secondsRemaining = activeQuizQuestions.length * 60;
+      startTimer();
+      renderCurrentQuestion();
+      renderPalette();
+      renderBulbs();
+      playDingDing();
+    } catch {
+      toast('Failed to load quiz arena', 'error');
+    }
+  }
+
+  function startTimer() {
+    clearInterval(quizTimerInterval);
+    updateTimerDisplay();
+
+    quizTimerInterval = setInterval(() => {
+      secondsRemaining--;
+      updateTimerDisplay();
+
+      if (secondsRemaining <= 30 && secondsRemaining > 0) {
+        document.getElementById('arena-timer').style.borderColor = 'var(--danger)';
+        document.getElementById('arena-timer').style.color = 'var(--danger)';
+        if (secondsRemaining <= 10) playBuzzer();
+      }
+
+      if (secondsRemaining <= 0) {
+        clearInterval(quizTimerInterval);
+        toast('BZZZZT! Time is up, Contestant! Submitting answers…', 'info');
+        submitQuizAnswers();
+      }
+    }, 1000);
+  }
+
+  function updateTimerDisplay() {
+    const mins = Math.floor(Math.max(0, secondsRemaining) / 60);
+    const secs = Math.max(0, secondsRemaining) % 60;
+    document.getElementById('arena-time-left').textContent =
+      `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+
+  function renderBulbs() {
+    const track = document.getElementById('arena-bulb-track');
+    track.innerHTML = activeQuizQuestions.map((q, idx) => {
+      const isAnswered = !!userAnswers[q.id];
+      const isCurrent = idx === currentQuestionIndex;
+      const cls = isCurrent ? 'bulb-node current' : isAnswered ? 'bulb-node lit' : 'bulb-node';
+      return `<div class="${cls}" title="Q${idx+1}"></div>`;
+    }).join('');
+  }
+
+  function renderPalette() {
+    const strip = document.getElementById('arena-palette');
+    strip.innerHTML = activeQuizQuestions.map((q, idx) => {
+      const isCurrent = idx === currentQuestionIndex;
+      const isAnswered = !!userAnswers[q.id];
+      let cls = 'palette-node';
+      if (isCurrent) cls += ' active';
+      else if (isAnswered) cls += ' answered';
+
+      return `<button class="${cls}" onclick="jumpQuestion(${idx})">${idx + 1}</button>`;
+    }).join('');
+  }
+
+  function renderCurrentQuestion() {
+    if (!activeQuizQuestions || activeQuizQuestions.length === 0) return;
+    const q = activeQuizQuestions[currentQuestionIndex];
+
+    document.getElementById('arena-q-step').textContent =
+      `Question ${currentQuestionIndex + 1} of ${activeQuizQuestions.length}`;
+    document.getElementById('arena-q-diff').innerHTML =
+      `<span class="badge badge-default">${escHtml(q.category || 'General')}</span>`;
+    document.getElementById('arena-q-title').textContent = q.questionTitle;
+
+    const selected = userAnswers[q.id];
+    const letters = ['A', 'B', 'C', 'D'];
+    const options = [q.option1, q.option2, q.option3, q.option4].filter(Boolean);
+
+    const grid = document.getElementById('arena-options-grid');
+    grid.innerHTML = options.map((opt, i) => {
+      const isSelected = selected === opt;
+      return `
+        <button class="option-btn ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${q.id}, '${escHtml(opt)}')">
+          <span class="option-letter">${letters[i]}</span>
+          <span>${escHtml(opt)}</span>
+        </button>
+      `;
+    }).join('');
+
+    document.getElementById('arena-prev-btn').disabled = currentQuestionIndex === 0;
+    const isLast = currentQuestionIndex === activeQuizQuestions.length - 1;
+    document.getElementById('arena-next-btn').style.display = isLast ? 'none' : 'inline-flex';
+    document.getElementById('arena-submit-btn').style.display = isLast ? 'inline-flex' : 'none';
+
+    renderPalette();
+    renderBulbs();
+  }
+
+  function selectAnswer(questionId, optionText) {
+    userAnswers[questionId] = optionText;
+    playBeep(523, 0.08, 'sine');
+    renderCurrentQuestion();
+  }
+
+  function nextQuestion() {
+    if (currentQuestionIndex < activeQuizQuestions.length - 1) {
+      currentQuestionIndex++;
+      renderCurrentQuestion();
+    }
+  }
+
+  function prevQuestion() {
+    if (currentQuestionIndex > 0) {
+      currentQuestionIndex--;
+      renderCurrentQuestion();
+    }
+  }
+
+  function jumpQuestion(idx) {
+    currentQuestionIndex = idx;
+    renderCurrentQuestion();
+  }
+
+  function confirmExitQuiz() {
+    if (confirm('Leave the arena? Current progress in this assessment will be lost.')) {
+      clearInterval(quizTimerInterval);
+      document.getElementById('arena-view').classList.remove('open');
+    }
+  }
+
+  function promptSubmitQuiz() {
+    const answeredCount = Object.keys(userAnswers).length;
+    const totalCount = activeQuizQuestions.length;
+    const unanswered = totalCount - answeredCount;
+
+    if (unanswered > 0) {
+      toast(`You have ${unanswered} unanswered question(s). Submitting…`, 'info');
+    }
+    submitQuizAnswers();
+  }
+
+  async function submitQuizAnswers() {
+    clearInterval(quizTimerInterval);
+    const btn = document.getElementById('arena-submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = `<i class="ri-loader-4-line"></i> Grading Your Ticket…`;
+
+    const payload = activeQuizQuestions.map(q => ({
+      id: q.id,
+      response: userAnswers[q.id] || ''
+    }));
+
+    try {
+      const url = `${API_Z}/submit/${activeQuizId}?strategy=${activeScoringType}`;
+      const r = await authFetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!r.ok) throw new Error();
+      const resultDto = await r.json();
+
+      document.getElementById('arena-view').classList.remove('open');
+      showResults(resultDto);
+    } catch {
+      toast('Error submitting answers', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="ri-checkbox-circle-line"></i> Submit Final Answers!`;
+    }
+  }
+
+  // ── Results Screen ─────────────────────────────────────────────────────────
+  function showResults(data) {
+    document.getElementById('res-score').textContent = `${data.score} / ${data.totalQuestions}`;
+    document.getElementById('res-percentage').textContent = `${Math.round(data.percentage)}% Accuracy`;
+    document.getElementById('res-correct').textContent = data.correctAnswers;
+    document.getElementById('res-incorrect').textContent = data.incorrectAnswers;
+    document.getElementById('res-strategy').textContent = data.scoringStrategy || activeScoringType;
+
+    if (data.percentage >= 80) {
+      document.getElementById('res-title').textContent = "GRAND CHAMPION WINNER! ★";
+      document.getElementById('res-remark').textContent = "Incredible performance, contestant! Outstanding mastery!";
+      playDingDing();
+      launchConfetti();
+    } else if (data.percentage >= 50) {
+      document.getElementById('res-title').textContent = "Solid Round, Contestant!";
+      document.getElementById('res-remark').textContent = "Great effort! A bit more practice and you will take the trophy.";
+      playDingDing();
+    } else {
+      document.getElementById('res-title').textContent = "Tough Round, Contestant!";
+      document.getElementById('res-remark').textContent = "Review the answer key below and step up again!";
+      playBuzzer();
+    }
+
+    const reviewList = document.getElementById('review-list');
+    reviewList.innerHTML = (data.breakdown || []).map((item, idx) => {
+      const isCorrect = Boolean(item.isCorrect !== undefined ? item.isCorrect : item.correct);
+      return `
+        <div class="review-item ${isCorrect ? 'correct' : 'incorrect'}">
+          <div style="font-weight:700;margin-bottom:0.4rem;display:flex;align-items:center;justify-content:space-between;">
+            <span>Q${idx+1}. ${escHtml(item.questionTitle)}</span>
+            <span class="badge ${isCorrect ? 'badge-easy' : 'badge-hard'}">
+              ${isCorrect ? 'Ding Ding! (+1 Pt)' : 'Bzzzt! (0 Pt)'}
+            </span>
+          </div>
+          <div style="display:flex;gap:1.5rem;font-size:0.8rem;flex-wrap:wrap;font-family:var(--font-mono);">
+            <div><strong>Your Answer:</strong> <span style="color:${isCorrect ? 'var(--success)' : 'var(--danger)'}">${escHtml(item.userResponse || 'Skipped')}</span></div>
+            <div><strong>Correct Answer:</strong> <span style="color:var(--success);font-weight:700;">${escHtml(item.correctAnswer)}</span></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('result-view').classList.add('open');
+  }
+
+  function closeResults() {
+    document.getElementById('result-view').classList.remove('open');
+    switchTab('quizzes');
+  }
+
+  function retakeCurrentQuiz() {
+    closeResults();
+    if (activeQuizId) {
+      launchQuiz(activeQuizId, activeQuizTitle, activeScoringType);
+    }
+  }
+
+  // ── Analytics ──────────────────────────────────────────────────────────────
+  async function loadAnalytics() {
+    if (!isTeacher()) return;
+    try {
+      const r = await authFetch('/analytics/overview');
+      if (!r.ok) return;
+      const data = await r.json();
+
+      const catBody = document.getElementById('category-chart-body');
+      const cats = data.categoryDistribution || {};
+      catBody.innerHTML = Object.entries(cats).map(([cat, count]) => `
+        <div style="margin-bottom:0.85rem;">
+          <div style="display:flex;justify-content:space-between;font-size:0.85rem;font-weight:700;margin-bottom:0.25rem;">
+            <span>${escHtml(cat)}</span>
+            <span style="font-family:var(--font-mono);">${count} Questions</span>
+          </div>
+          <div style="background:#FCEFD2;height:12px;border:2px solid var(--border-color);border-radius:var(--radius-pill);overflow:hidden;">
+            <div style="background:var(--mustard);height:100%;width:${Math.min(100, count * 5)}%;"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const diffBody = document.getElementById('difficulty-chart-body');
+      const diffs = data.difficultyDistribution || {};
+      diffBody.innerHTML = Object.entries(diffs).map(([diff, count]) => `
+        <div style="margin-bottom:0.85rem;">
+          <div style="display:flex;justify-content:space-between;font-size:0.85rem;font-weight:700;margin-bottom:0.25rem;">
+            <span>${escHtml(diff)}</span>
+            <span style="font-family:var(--font-mono);">${count} Questions</span>
+          </div>
+          <div style="background:#FCEFD2;height:12px;border:2px solid var(--border-color);border-radius:var(--radius-pill);overflow:hidden;">
+            <div style="background:var(--orange);height:100%;width:${Math.min(100, count * 5)}%;"></div>
+          </div>
+        </div>
+      `).join('');
+    } catch {}
+  }
+
+  // ── Confetti Animation ─────────────────────────────────────────────────────
+  function launchConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ['#E2662B', '#EBB02D', '#2A8C82', '#7A8B3A', '#FFF8EA', '#2B1D14'];
+    const particles = Array.from({ length: 90 }, () => ({
+      x: Math.random() * canvas.width,
+      y: -20,
+      r: Math.random() * 8 + 4,
+      d: Math.random() * 90 + 10,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      tilt: Math.floor(Math.random() * 10) - 10,
+      tiltAngleInc: (Math.random() * 0.07) + 0.05,
+      tiltAngle: 0
+    }));
+
+    let animationFrame;
+    let start = Date.now();
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.lineWidth = p.r / 2;
+        ctx.strokeStyle = p.color;
+        ctx.moveTo(p.x + p.tilt + (p.r / 4), p.y);
+        ctx.lineTo(p.x + p.tilt, p.y + p.tilt + (p.r / 4));
+        ctx.stroke();
+
+        p.tiltAngle += p.tiltAngleInc;
+        p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+        p.x += Math.sin(p.d);
+        p.tilt = Math.sin(p.tiltAngle - (particles.indexOf(p) / 3)) * 15;
+      });
+
+      if (Date.now() - start < 3500) {
+        animationFrame = requestAnimationFrame(draw);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        cancelAnimationFrame(animationFrame);
+      }
+    }
+    draw();
+  }
+
+  // ── Keyboard Shortcuts ─────────────────────────────────────────────────────
+  window.addEventListener('keydown', e => {
+    if (!document.getElementById('arena-view').classList.contains('open')) return;
+
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+      nextQuestion();
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      prevQuestion();
+    } else if (['1', '2', '3', '4'].includes(e.key)) {
+      const idx = parseInt(e.key) - 1;
+      const opts = document.querySelectorAll('.option-btn');
+      if (opts[idx]) opts[idx].click();
+    } else if (e.key === 'Escape') {
+      confirmExitQuiz();
+    }
   });
 
-  // ── Init ──────────────────────────────────────────────────────────────────────
-  checkHealth();
-  loadQuestions();
-  setInterval(checkHealth, 30000); // re-check health every 30s
+  // ── Initialization on Load ────────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    renderAuthUI();
+    checkHealth();
+    setInterval(checkHealth, 15000);
+
+    // Initial load
+    switchTab('quizzes');
+  });
 </script>
 </body>
 </html>

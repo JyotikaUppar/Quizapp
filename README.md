@@ -1,7 +1,7 @@
 # 🧠 Quiz Manager — Spring Boot REST API
 
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.7-6DB33F?style=flat&logo=springboot&logoColor=white)
-![Java](https://img.shields.io/badge/Java-25-ED8B00?style=flat&logo=openjdk&logoColor=white)
+![Java](https://img.shields.io/badge/Java-17%20LTS%20(Java%208%20features)-ED8B00?style=flat&logo=openjdk&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-336791?style=flat&logo=postgresql&logoColor=white)
 ![Swagger](https://img.shields.io/badge/Swagger-OpenAPI%203-85EA2D?style=flat&logo=swagger&logoColor=black)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=flat)
@@ -27,15 +27,31 @@ A full-featured **Quiz Management REST API** built with Spring Boot, featuring a
 
 ## ✨ Features
 
-- ✅ **Full CRUD** — Create, Read, Update, Delete questions
+- 🔐 **Spring Security & JWT RBAC** — Stateless JWT token authentication with granular Role-Based Access Control
+  - 👑 **Admin / Teacher**: Full CRUD access on questions, quiz builder, delete quizzes, and platform analytics
+  - 🎓 **Candidate / Student**: Read-only browsing, interactive quiz taking, instant scorecards, and answer review
+- 🎮 **Interactive Quiz Arena** — Fullscreen player mode with live countdown timer, audio cues, keyboard navigation, and question jumper palette
+- 🎯 **Quiz Hub & Custom Builder** — Generate quizzes by category, size, and scoring mode (Standard, Negative Marking, Percentage)
+- 🎲 **Instant Random Challenge** — 1-click randomized quiz generation and immediate launch
+- 🏆 **Detailed Results & Review** — Confetti celebration, performance remarks, score percentage, and side-by-side answer breakdown
+- 📊 **Visual Analytics** — Live breakdown of questions by category and difficulty
+- ✅ **Full Question Bank CRUD** — Create, Read, Update, Delete questions with live search & filtering
 - 📄 **Pagination & Sorting** — Server-side paginated responses
-- 🔍 **Filtering** — By category, difficulty, or both combined
 - ✅ **Bean Validation** — `@NotBlank`, `@Size` on all required fields
-- ⚠️ **Global Exception Handling** — Structured JSON errors (400, 404, 500)
-- 📄 **Swagger / OpenAPI 3** — Interactive API documentation
+- ⚠️ **Global Exception Handling** — Structured JSON errors (400, 401, 403, 404, 500)
+- 📄 **Swagger / OpenAPI 3** — Interactive API documentation with Bearer Auth
 - 🩺 **Spring Boot Actuator** — Health, info, and metrics endpoints
-- 🖥️ **Built-in Frontend** — Dark-themed dashboard (no build step)
+- 🖥️ **Built-in Frontend Dashboard** — Glassmorphic dark-themed SPA (no Node build step needed)
 - 🗄️ **PostgreSQL** — Persistent data storage via Spring Data JPA
+
+---
+
+## 👥 Default Demo Credentials
+
+| Role | Username | Password | Permissions |
+|------|----------|----------|-------------|
+| 👑 **Admin / Teacher** | `admin` | `admin123` | Full CRUD on questions, create/delete quizzes, inspect analytics |
+| 🎓 **Candidate / Student** | `student` | `student123` | Read-only browsing, take quizzes, submit answers, view scores |
 
 ---
 
@@ -44,7 +60,8 @@ A full-featured **Quiz Management REST API** built with Spring Boot, featuring a
 | Layer | Technology |
 |-------|-----------|
 | Framework | Spring Boot 4.0.7 |
-| Language | Java 25 |
+| Security | Spring Security 7 + JWT (JJWT 0.12.6) + BCrypt |
+| Language | Java 17 LTS (Java 8 features: Streams, Lambdas, Optional) |
 | Database | PostgreSQL 18 |
 | ORM | Spring Data JPA / Hibernate |
 | Validation | Jakarta Bean Validation |

@@ -27,6 +27,9 @@ A full-featured **Quiz Management REST API** built with Spring Boot, featuring a
 
 ## ✨ Features
 
+- 🔐 **Spring Security & JWT RBAC** — Stateless JWT token authentication with granular Role-Based Access Control
+  - 👑 **Admin / Teacher**: Full CRUD access on questions, quiz builder, delete quizzes, and platform analytics
+  - 🎓 **Candidate / Student**: Read-only browsing, interactive quiz taking, instant scorecards, and answer review
 - 🎮 **Interactive Quiz Arena** — Fullscreen player mode with live countdown timer, audio cues, keyboard navigation, and question jumper palette
 - 🎯 **Quiz Hub & Custom Builder** — Generate quizzes by category, size, and scoring mode (Standard, Negative Marking, Percentage)
 - 🎲 **Instant Random Challenge** — 1-click randomized quiz generation and immediate launch
@@ -35,11 +38,20 @@ A full-featured **Quiz Management REST API** built with Spring Boot, featuring a
 - ✅ **Full Question Bank CRUD** — Create, Read, Update, Delete questions with live search & filtering
 - 📄 **Pagination & Sorting** — Server-side paginated responses
 - ✅ **Bean Validation** — `@NotBlank`, `@Size` on all required fields
-- ⚠️ **Global Exception Handling** — Structured JSON errors (400, 404, 500)
-- 📄 **Swagger / OpenAPI 3** — Interactive API documentation
+- ⚠️ **Global Exception Handling** — Structured JSON errors (400, 401, 403, 404, 500)
+- 📄 **Swagger / OpenAPI 3** — Interactive API documentation with Bearer Auth
 - 🩺 **Spring Boot Actuator** — Health, info, and metrics endpoints
 - 🖥️ **Built-in Frontend Dashboard** — Glassmorphic dark-themed SPA (no Node build step needed)
 - 🗄️ **PostgreSQL** — Persistent data storage via Spring Data JPA
+
+---
+
+## 👥 Default Demo Credentials
+
+| Role | Username | Password | Permissions |
+|------|----------|----------|-------------|
+| 👑 **Admin / Teacher** | `admin` | `admin123` | Full CRUD on questions, create/delete quizzes, inspect analytics |
+| 🎓 **Candidate / Student** | `student` | `student123` | Read-only browsing, take quizzes, submit answers, view scores |
 
 ---
 
@@ -48,6 +60,7 @@ A full-featured **Quiz Management REST API** built with Spring Boot, featuring a
 | Layer | Technology |
 |-------|-----------|
 | Framework | Spring Boot 4.0.7 |
+| Security | Spring Security 7 + JWT (JJWT 0.12.6) + BCrypt |
 | Language | Java 17 LTS (Java 8 features: Streams, Lambdas, Optional) |
 | Database | PostgreSQL 18 |
 | ORM | Spring Data JPA / Hibernate |

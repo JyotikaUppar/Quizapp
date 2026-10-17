@@ -1,5 +1,6 @@
 package com.FirstSpring.quizproject.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +29,17 @@ public class QuestionFeedbackDto {
     @Schema(description = "The correct answer", example = "Paris")
     private String correctAnswer;
 
+    @JsonProperty("isCorrect")
     @Schema(description = "Whether the user's answer was correct", example = "false")
     private boolean isCorrect;
+
+    @JsonProperty("isCorrect")
+    public boolean isCorrect() {
+        return isCorrect;
+    }
+
+    @JsonProperty("isCorrect")
+    public void setCorrect(boolean isCorrect) {
+        this.isCorrect = isCorrect;
+    }
 }

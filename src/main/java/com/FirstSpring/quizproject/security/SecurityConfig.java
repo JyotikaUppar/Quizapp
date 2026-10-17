@@ -60,25 +60,40 @@ public class SecurityConfig {
                 })
             )
             .authorizeHttpRequests(auth -> auth
-                // Public Assets & Documentation
-                .requestMatchers("/", "/index.html", "/favicon.ico", "/static/**", "/css/**", "/js/**").permitAll()
+                // Public Assets, Documentation & Angular SPA Routes
+                .requestMatchers(
+                    "/",
+                    "/index.html",
+                    "/login",
+                    "/quizzes",
+                    "/quiz/*",
+                    "/questions",
+                    "/analytics",
+                    "/favicon.ico",
+                    "/*.js",
+                    "/*.css",
+                    "/*.txt",
+                    "/media/**",
+                    "/assets/**",
+                    "/static/**"
+                ).permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/api-docs/**").permitAll()
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
 
                 // Public Authentication Endpoints
                 .requestMatchers("/auth/**").permitAll()
 
-                // ADMIN ONLY Privileges: Question & Quiz Mutating Operations + Analytics
+                // Teacher / Admin Only: Question modifications (add, update, delete) and quiz creation/deletion
                 .requestMatchers(HttpMethod.POST, "/question/add").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/question/update/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/question/delete/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/quiz/create").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/quiz/delete/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/question/analytics").hasRole("ADMIN")
 
-                // CANDIDATE / STUDENT & ADMIN Privileges: Browse questions, take quizzes & submit
-                .requestMatchers("/question/**").hasAnyRole("STUDENT", "ADMIN")
+                // Both Student and Admin: Read questions, browse & take quizzes, analytics
+                .requestMatchers(HttpMethod.GET, "/question/**").hasAnyRole("STUDENT", "ADMIN")
                 .requestMatchers("/quiz/**").hasAnyRole("STUDENT", "ADMIN")
+                .requestMatchers("/analytics/**").hasAnyRole("STUDENT", "ADMIN")
 
                 .anyRequest().authenticated()
             )
